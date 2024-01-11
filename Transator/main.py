@@ -175,7 +175,7 @@ def p_else_if_statement(p):
     | empty"""
     p[0] = ""
     if len(p) == 8:
-        p[0] = "elif " + p[4] + ":\n{\n" + p[6] + "}\n"
+        p[0] = "elif " + p[4] + ":\n{\n" + p[6] + "\n}\n"
     else:
         p[0] = "elif " + p[4] + ":\n{\n" + p[7] + "}\n"
 
@@ -206,7 +206,7 @@ def p_for_assign(p):
 
 def p_increment(p):
     """increment : variable PLUS PLUS"""
-    p[0] = p[1] + "+=1\n"
+    p[0] = p[1] + "+=1"
 
 
 def p_decrement(p):
@@ -215,19 +215,19 @@ def p_decrement(p):
 
 
 def p_for_iteration(p):
-    """for_iteration : expression COMMA for_iteration
-    | expression
+    """for_iteration : var_assign COMMA for_iteration
+    | var_assign
     | empty"""
     p[0] = ""
     if p[1] != "":
         p[0] = p[1] + "\n"
     if len(p) == 4:
-        p[0] = p[0] + p[3]
+        p[0] = p[0]  + p[3]
 
 
 def p_for_loop(p):
     """for_loop : FOR LPAREN for_assign SEMICOLON boolean_expr SEMICOLON for_iteration RPAREN LBRACE body RBRACE"""
-    p[0] = p[3] + "while " + p[5] + ":\n{\n"  + p[10] + p[7]
+    p[0] = p[3] + "while " + p[5] + ":\n{\n"  + p[10] + p[7] + "\n}\n"
 
 
 def p_comment(p):
@@ -355,6 +355,7 @@ def p_body(p):
     | print SEMICOLON body
     | increment SEMICOLON body
     | decrement SEMICOLON body
+    | comment body
     | empty"""
     p[0] = ""
     if len(p) == 3:
@@ -392,3 +393,22 @@ result = parser.parse(lines)
 out.write(result)
 print(result)
 f.close()
+out.close()
+
+
+def make_py_tabs():
+    file = open("out.py", "rt")
+    lines = file.readlines()
+    out = open("out2.py", "w")
+    cnt = 0
+    for line in lines:
+        if line == "{\n":
+            cnt += 1
+        elif line == "}\n":
+            cnt -= 1
+        else:
+            line = "\t"*cnt + line
+            out.write(line)
+
+
+make_py_tabs()

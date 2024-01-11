@@ -39,8 +39,8 @@ Rule 27    for_assign -> var_assign
 Rule 28    for_assign -> empty
 Rule 29    increment -> variable PLUS PLUS
 Rule 30    decrement -> variable MINUS MINUS
-Rule 31    for_iteration -> expression COMMA for_iteration
-Rule 32    for_iteration -> expression
+Rule 31    for_iteration -> var_assign COMMA for_iteration
+Rule 32    for_iteration -> var_assign
 Rule 33    for_iteration -> empty
 Rule 34    for_loop -> FOR LPAREN for_assign SEMICOLON boolean_expr SEMICOLON for_iteration RPAREN LBRACE body RBRACE
 Rule 35    comment -> COMMENT
@@ -91,7 +91,8 @@ Rule 79    body -> var_assign SEMICOLON body
 Rule 80    body -> print SEMICOLON body
 Rule 81    body -> increment SEMICOLON body
 Rule 82    body -> decrement SEMICOLON body
-Rule 83    body -> empty
+Rule 83    body -> comment body
+Rule 84    body -> empty
 
 Terminals, with rules where they appear
 
@@ -144,19 +145,19 @@ error                :
 Nonterminals, with rules where they appear
 
 array                : 12
-body                 : 18 20 23 25 34 69 75 76 77 78 79 80 81 82
+body                 : 18 20 23 25 34 69 75 76 77 78 79 80 81 82 83
 bool_literal         : 52 68
 bool_op              : 66
 boolean_expr         : 18 19 20 21 25 34 65 66 66 67
 brackets             : 8 10
 call_args            : 70 72
-comment              : 3
+comment              : 3 83
 compare_op           : 64
 decrement            : 82
 else_if_statement    : 16 20
 else_statement       : 16 17
-empty                : 4 22 28 33 37 71 83
-expression           : 7 13 14 31 32 59 59 60 64 64 74 78
+empty                : 4 22 28 33 37 71 84
+expression           : 7 13 14 59 59 60 64 64 74 78
 for_assign           : 26 34
 for_iteration        : 31 34
 for_loop             : 76
@@ -172,7 +173,7 @@ operator             : 59
 print                : 80
 start                : 1 2 3 0
 type                 : 14 69
-var_assign           : 19 21 24 26 27 79
+var_assign           : 19 21 24 26 27 31 32 79
 variable             : 5 13 14 29 30 63 70
 while_loop           : 75
 
@@ -420,6 +421,17 @@ state 8
     STRING          reduce using rule 35 (comment -> COMMENT .)
     BOOL            reduce using rule 35 (comment -> COMMENT .)
     $end            reduce using rule 35 (comment -> COMMENT .)
+    WHILE           reduce using rule 35 (comment -> COMMENT .)
+    FOR             reduce using rule 35 (comment -> COMMENT .)
+    LPAREN          reduce using rule 35 (comment -> COMMENT .)
+    STD             reduce using rule 35 (comment -> COMMENT .)
+    IF              reduce using rule 35 (comment -> COMMENT .)
+    NUMBER          reduce using rule 35 (comment -> COMMENT .)
+    STR             reduce using rule 35 (comment -> COMMENT .)
+    ID              reduce using rule 35 (comment -> COMMENT .)
+    TRUE            reduce using rule 35 (comment -> COMMENT .)
+    FALSE           reduce using rule 35 (comment -> COMMENT .)
+    RBRACE          reduce using rule 35 (comment -> COMMENT .)
 
 
 state 9
@@ -529,7 +541,8 @@ state 21
     (80) body -> . print SEMICOLON body
     (81) body -> . increment SEMICOLON body
     (82) body -> . decrement SEMICOLON body
-    (83) body -> . empty
+    (83) body -> . comment body
+    (84) body -> . empty
     (25) while_loop -> . WHILE LPAREN boolean_expr RPAREN LBRACE body RBRACE
     (34) for_loop -> . FOR LPAREN for_assign SEMICOLON boolean_expr SEMICOLON for_iteration RPAREN LBRACE body RBRACE
     (15) if_else_statement -> . if_statement
@@ -545,6 +558,7 @@ state 21
     (74) print -> . STD NAMESPACE COUT DLEFT expression
     (29) increment -> . variable PLUS PLUS
     (30) decrement -> . variable MINUS MINUS
+    (35) comment -> . COMMENT
     (73) empty -> .
     (18) if_statement -> . IF LPAREN boolean_expr RPAREN LBRACE body RBRACE
     (19) if_statement -> . IF LPAREN boolean_expr RPAREN var_assign SEMICOLON
@@ -562,21 +576,22 @@ state 21
     (54) bool_literal -> . FALSE
     (10) array -> . ID brackets
 
-    WHILE           shift and go to state 35
-    FOR             shift and go to state 36
+    WHILE           shift and go to state 36
+    FOR             shift and go to state 37
     LPAREN          shift and go to state 24
-    STD             shift and go to state 41
+    STD             shift and go to state 42
+    COMMENT         shift and go to state 8
     RBRACE          reduce using rule 73 (empty -> .)
-    IF              shift and go to state 42
-    NUMBER          shift and go to state 43
-    STR             shift and go to state 44
+    IF              shift and go to state 43
+    NUMBER          shift and go to state 44
+    STR             shift and go to state 45
     ID              shift and go to state 23
     INT             shift and go to state 9
     DOUBLE          shift and go to state 10
     STRING          shift and go to state 11
     BOOL            shift and go to state 12
-    TRUE            shift and go to state 47
-    FALSE           shift and go to state 48
+    TRUE            shift and go to state 48
+    FALSE           shift and go to state 49
 
     type                           shift and go to state 22
     body                           shift and go to state 25
@@ -588,13 +603,14 @@ state 21
     print                          shift and go to state 31
     increment                      shift and go to state 32
     decrement                      shift and go to state 33
-    empty                          shift and go to state 34
-    if_statement                   shift and go to state 37
-    literal                        shift and go to state 38
-    function_call                  shift and go to state 39
-    variable                       shift and go to state 40
-    bool_literal                   shift and go to state 45
-    array                          shift and go to state 46
+    comment                        shift and go to state 34
+    empty                          shift and go to state 35
+    if_statement                   shift and go to state 38
+    literal                        shift and go to state 39
+    function_call                  shift and go to state 40
+    variable                       shift and go to state 41
+    bool_literal                   shift and go to state 46
+    array                          shift and go to state 47
 
 state 22
 
@@ -603,10 +619,10 @@ state 22
     (12) variable -> . array
     (10) array -> . ID brackets
 
-    ID              shift and go to state 50
+    ID              shift and go to state 51
 
-    variable                       shift and go to state 49
-    array                          shift and go to state 46
+    variable                       shift and go to state 50
+    array                          shift and go to state 47
 
 state 23
 
@@ -616,7 +632,7 @@ state 23
     (8) brackets -> . LBRACKET index RBRACKET brackets
     (9) brackets -> . LBRACKET index RBRACKET
 
-    LPAREN          shift and go to state 51
+    LPAREN          shift and go to state 52
     ASSIGN          reduce using rule 11 (variable -> ID .)
     PLUS            reduce using rule 11 (variable -> ID .)
     MINUS           reduce using rule 11 (variable -> ID .)
@@ -634,9 +650,9 @@ state 23
     COMMA           reduce using rule 11 (variable -> ID .)
     AND             reduce using rule 11 (variable -> ID .)
     OR              reduce using rule 11 (variable -> ID .)
-    LBRACKET        shift and go to state 53
+    LBRACKET        shift and go to state 54
 
-    brackets                       shift and go to state 52
+    brackets                       shift and go to state 53
 
 state 24
 
@@ -657,24 +673,24 @@ state 24
     (10) array -> . ID brackets
 
     LPAREN          shift and go to state 24
-    NUMBER          shift and go to state 43
-    STR             shift and go to state 44
+    NUMBER          shift and go to state 44
+    STR             shift and go to state 45
     ID              shift and go to state 23
-    TRUE            shift and go to state 47
-    FALSE           shift and go to state 48
+    TRUE            shift and go to state 48
+    FALSE           shift and go to state 49
 
-    expression                     shift and go to state 54
-    literal                        shift and go to state 38
-    function_call                  shift and go to state 39
-    variable                       shift and go to state 55
-    bool_literal                   shift and go to state 45
-    array                          shift and go to state 46
+    expression                     shift and go to state 55
+    literal                        shift and go to state 39
+    function_call                  shift and go to state 40
+    variable                       shift and go to state 56
+    bool_literal                   shift and go to state 46
+    array                          shift and go to state 47
 
 state 25
 
     (69) function -> type ID LPAREN RPAREN LBRACE body . RBRACE
 
-    RBRACE          shift and go to state 56
+    RBRACE          shift and go to state 57
 
 
 state 26
@@ -688,7 +704,8 @@ state 26
     (80) body -> . print SEMICOLON body
     (81) body -> . increment SEMICOLON body
     (82) body -> . decrement SEMICOLON body
-    (83) body -> . empty
+    (83) body -> . comment body
+    (84) body -> . empty
     (25) while_loop -> . WHILE LPAREN boolean_expr RPAREN LBRACE body RBRACE
     (34) for_loop -> . FOR LPAREN for_assign SEMICOLON boolean_expr SEMICOLON for_iteration RPAREN LBRACE body RBRACE
     (15) if_else_statement -> . if_statement
@@ -704,6 +721,7 @@ state 26
     (74) print -> . STD NAMESPACE COUT DLEFT expression
     (29) increment -> . variable PLUS PLUS
     (30) decrement -> . variable MINUS MINUS
+    (35) comment -> . COMMENT
     (73) empty -> .
     (18) if_statement -> . IF LPAREN boolean_expr RPAREN LBRACE body RBRACE
     (19) if_statement -> . IF LPAREN boolean_expr RPAREN var_assign SEMICOLON
@@ -721,24 +739,25 @@ state 26
     (54) bool_literal -> . FALSE
     (10) array -> . ID brackets
 
-    WHILE           shift and go to state 35
-    FOR             shift and go to state 36
+    WHILE           shift and go to state 36
+    FOR             shift and go to state 37
     LPAREN          shift and go to state 24
-    STD             shift and go to state 41
+    STD             shift and go to state 42
+    COMMENT         shift and go to state 8
     RBRACE          reduce using rule 73 (empty -> .)
-    IF              shift and go to state 42
-    NUMBER          shift and go to state 43
-    STR             shift and go to state 44
+    IF              shift and go to state 43
+    NUMBER          shift and go to state 44
+    STR             shift and go to state 45
     ID              shift and go to state 23
     INT             shift and go to state 9
     DOUBLE          shift and go to state 10
     STRING          shift and go to state 11
     BOOL            shift and go to state 12
-    TRUE            shift and go to state 47
-    FALSE           shift and go to state 48
+    TRUE            shift and go to state 48
+    FALSE           shift and go to state 49
 
     while_loop                     shift and go to state 26
-    body                           shift and go to state 57
+    body                           shift and go to state 58
     for_loop                       shift and go to state 27
     if_else_statement              shift and go to state 28
     expression                     shift and go to state 29
@@ -746,14 +765,15 @@ state 26
     print                          shift and go to state 31
     increment                      shift and go to state 32
     decrement                      shift and go to state 33
-    empty                          shift and go to state 34
-    if_statement                   shift and go to state 37
-    literal                        shift and go to state 38
-    function_call                  shift and go to state 39
-    variable                       shift and go to state 40
+    comment                        shift and go to state 34
+    empty                          shift and go to state 35
+    if_statement                   shift and go to state 38
+    literal                        shift and go to state 39
+    function_call                  shift and go to state 40
+    variable                       shift and go to state 41
     type                           shift and go to state 22
-    bool_literal                   shift and go to state 45
-    array                          shift and go to state 46
+    bool_literal                   shift and go to state 46
+    array                          shift and go to state 47
 
 state 27
 
@@ -766,7 +786,8 @@ state 27
     (80) body -> . print SEMICOLON body
     (81) body -> . increment SEMICOLON body
     (82) body -> . decrement SEMICOLON body
-    (83) body -> . empty
+    (83) body -> . comment body
+    (84) body -> . empty
     (25) while_loop -> . WHILE LPAREN boolean_expr RPAREN LBRACE body RBRACE
     (34) for_loop -> . FOR LPAREN for_assign SEMICOLON boolean_expr SEMICOLON for_iteration RPAREN LBRACE body RBRACE
     (15) if_else_statement -> . if_statement
@@ -782,6 +803,7 @@ state 27
     (74) print -> . STD NAMESPACE COUT DLEFT expression
     (29) increment -> . variable PLUS PLUS
     (30) decrement -> . variable MINUS MINUS
+    (35) comment -> . COMMENT
     (73) empty -> .
     (18) if_statement -> . IF LPAREN boolean_expr RPAREN LBRACE body RBRACE
     (19) if_statement -> . IF LPAREN boolean_expr RPAREN var_assign SEMICOLON
@@ -799,24 +821,25 @@ state 27
     (54) bool_literal -> . FALSE
     (10) array -> . ID brackets
 
-    WHILE           shift and go to state 35
-    FOR             shift and go to state 36
+    WHILE           shift and go to state 36
+    FOR             shift and go to state 37
     LPAREN          shift and go to state 24
-    STD             shift and go to state 41
+    STD             shift and go to state 42
+    COMMENT         shift and go to state 8
     RBRACE          reduce using rule 73 (empty -> .)
-    IF              shift and go to state 42
-    NUMBER          shift and go to state 43
-    STR             shift and go to state 44
+    IF              shift and go to state 43
+    NUMBER          shift and go to state 44
+    STR             shift and go to state 45
     ID              shift and go to state 23
     INT             shift and go to state 9
     DOUBLE          shift and go to state 10
     STRING          shift and go to state 11
     BOOL            shift and go to state 12
-    TRUE            shift and go to state 47
-    FALSE           shift and go to state 48
+    TRUE            shift and go to state 48
+    FALSE           shift and go to state 49
 
     for_loop                       shift and go to state 27
-    body                           shift and go to state 58
+    body                           shift and go to state 59
     while_loop                     shift and go to state 26
     if_else_statement              shift and go to state 28
     expression                     shift and go to state 29
@@ -824,14 +847,15 @@ state 27
     print                          shift and go to state 31
     increment                      shift and go to state 32
     decrement                      shift and go to state 33
-    empty                          shift and go to state 34
-    if_statement                   shift and go to state 37
-    literal                        shift and go to state 38
-    function_call                  shift and go to state 39
-    variable                       shift and go to state 40
+    comment                        shift and go to state 34
+    empty                          shift and go to state 35
+    if_statement                   shift and go to state 38
+    literal                        shift and go to state 39
+    function_call                  shift and go to state 40
+    variable                       shift and go to state 41
     type                           shift and go to state 22
-    bool_literal                   shift and go to state 45
-    array                          shift and go to state 46
+    bool_literal                   shift and go to state 46
+    array                          shift and go to state 47
 
 state 28
 
@@ -844,7 +868,8 @@ state 28
     (80) body -> . print SEMICOLON body
     (81) body -> . increment SEMICOLON body
     (82) body -> . decrement SEMICOLON body
-    (83) body -> . empty
+    (83) body -> . comment body
+    (84) body -> . empty
     (25) while_loop -> . WHILE LPAREN boolean_expr RPAREN LBRACE body RBRACE
     (34) for_loop -> . FOR LPAREN for_assign SEMICOLON boolean_expr SEMICOLON for_iteration RPAREN LBRACE body RBRACE
     (15) if_else_statement -> . if_statement
@@ -860,6 +885,7 @@ state 28
     (74) print -> . STD NAMESPACE COUT DLEFT expression
     (29) increment -> . variable PLUS PLUS
     (30) decrement -> . variable MINUS MINUS
+    (35) comment -> . COMMENT
     (73) empty -> .
     (18) if_statement -> . IF LPAREN boolean_expr RPAREN LBRACE body RBRACE
     (19) if_statement -> . IF LPAREN boolean_expr RPAREN var_assign SEMICOLON
@@ -877,24 +903,25 @@ state 28
     (54) bool_literal -> . FALSE
     (10) array -> . ID brackets
 
-    WHILE           shift and go to state 35
-    FOR             shift and go to state 36
+    WHILE           shift and go to state 36
+    FOR             shift and go to state 37
     LPAREN          shift and go to state 24
-    STD             shift and go to state 41
+    STD             shift and go to state 42
+    COMMENT         shift and go to state 8
     RBRACE          reduce using rule 73 (empty -> .)
-    IF              shift and go to state 42
-    NUMBER          shift and go to state 43
-    STR             shift and go to state 44
+    IF              shift and go to state 43
+    NUMBER          shift and go to state 44
+    STR             shift and go to state 45
     ID              shift and go to state 23
     INT             shift and go to state 9
     DOUBLE          shift and go to state 10
     STRING          shift and go to state 11
     BOOL            shift and go to state 12
-    TRUE            shift and go to state 47
-    FALSE           shift and go to state 48
+    TRUE            shift and go to state 48
+    FALSE           shift and go to state 49
 
     if_else_statement              shift and go to state 28
-    body                           shift and go to state 59
+    body                           shift and go to state 60
     while_loop                     shift and go to state 26
     for_loop                       shift and go to state 27
     expression                     shift and go to state 29
@@ -902,14 +929,15 @@ state 28
     print                          shift and go to state 31
     increment                      shift and go to state 32
     decrement                      shift and go to state 33
-    empty                          shift and go to state 34
-    if_statement                   shift and go to state 37
-    literal                        shift and go to state 38
-    function_call                  shift and go to state 39
-    variable                       shift and go to state 40
+    comment                        shift and go to state 34
+    empty                          shift and go to state 35
+    if_statement                   shift and go to state 38
+    literal                        shift and go to state 39
+    function_call                  shift and go to state 40
+    variable                       shift and go to state 41
     type                           shift and go to state 22
-    bool_literal                   shift and go to state 45
-    array                          shift and go to state 46
+    bool_literal                   shift and go to state 46
+    array                          shift and go to state 47
 
 state 29
 
@@ -920,64 +948,146 @@ state 29
     (40) operator -> . DIVIDE
     (41) operator -> . TIMES
 
-    SEMICOLON       shift and go to state 60
-    PLUS            shift and go to state 62
-    MINUS           shift and go to state 63
-    DIVIDE          shift and go to state 64
-    TIMES           shift and go to state 65
+    SEMICOLON       shift and go to state 61
+    PLUS            shift and go to state 63
+    MINUS           shift and go to state 64
+    DIVIDE          shift and go to state 65
+    TIMES           shift and go to state 66
 
-    operator                       shift and go to state 61
+    operator                       shift and go to state 62
 
 state 30
 
     (79) body -> var_assign . SEMICOLON body
 
-    SEMICOLON       shift and go to state 66
+    SEMICOLON       shift and go to state 67
 
 
 state 31
 
     (80) body -> print . SEMICOLON body
 
-    SEMICOLON       shift and go to state 67
+    SEMICOLON       shift and go to state 68
 
 
 state 32
 
     (81) body -> increment . SEMICOLON body
 
-    SEMICOLON       shift and go to state 68
+    SEMICOLON       shift and go to state 69
 
 
 state 33
 
     (82) body -> decrement . SEMICOLON body
 
-    SEMICOLON       shift and go to state 69
+    SEMICOLON       shift and go to state 70
 
 
 state 34
 
-    (83) body -> empty .
+    (83) body -> comment . body
+    (75) body -> . while_loop body
+    (76) body -> . for_loop body
+    (77) body -> . if_else_statement body
+    (78) body -> . expression SEMICOLON body
+    (79) body -> . var_assign SEMICOLON body
+    (80) body -> . print SEMICOLON body
+    (81) body -> . increment SEMICOLON body
+    (82) body -> . decrement SEMICOLON body
+    (83) body -> . comment body
+    (84) body -> . empty
+    (25) while_loop -> . WHILE LPAREN boolean_expr RPAREN LBRACE body RBRACE
+    (34) for_loop -> . FOR LPAREN for_assign SEMICOLON boolean_expr SEMICOLON for_iteration RPAREN LBRACE body RBRACE
+    (15) if_else_statement -> . if_statement
+    (16) if_else_statement -> . if_statement else_if_statement else_statement
+    (17) if_else_statement -> . if_statement else_statement
+    (59) expression -> . expression operator expression
+    (60) expression -> . LPAREN expression RPAREN
+    (61) expression -> . literal
+    (62) expression -> . function_call
+    (63) expression -> . variable
+    (13) var_assign -> . variable ASSIGN expression
+    (14) var_assign -> . type variable ASSIGN expression
+    (74) print -> . STD NAMESPACE COUT DLEFT expression
+    (29) increment -> . variable PLUS PLUS
+    (30) decrement -> . variable MINUS MINUS
+    (35) comment -> . COMMENT
+    (73) empty -> .
+    (18) if_statement -> . IF LPAREN boolean_expr RPAREN LBRACE body RBRACE
+    (19) if_statement -> . IF LPAREN boolean_expr RPAREN var_assign SEMICOLON
+    (50) literal -> . NUMBER
+    (51) literal -> . STR
+    (52) literal -> . bool_literal
+    (72) function_call -> . ID LPAREN call_args RPAREN
+    (11) variable -> . ID
+    (12) variable -> . array
+    (55) type -> . INT
+    (56) type -> . DOUBLE
+    (57) type -> . STRING
+    (58) type -> . BOOL
+    (53) bool_literal -> . TRUE
+    (54) bool_literal -> . FALSE
+    (10) array -> . ID brackets
 
-    RBRACE          reduce using rule 83 (body -> empty .)
+    WHILE           shift and go to state 36
+    FOR             shift and go to state 37
+    LPAREN          shift and go to state 24
+    STD             shift and go to state 42
+    COMMENT         shift and go to state 8
+    RBRACE          reduce using rule 73 (empty -> .)
+    IF              shift and go to state 43
+    NUMBER          shift and go to state 44
+    STR             shift and go to state 45
+    ID              shift and go to state 23
+    INT             shift and go to state 9
+    DOUBLE          shift and go to state 10
+    STRING          shift and go to state 11
+    BOOL            shift and go to state 12
+    TRUE            shift and go to state 48
+    FALSE           shift and go to state 49
 
+    comment                        shift and go to state 34
+    body                           shift and go to state 71
+    while_loop                     shift and go to state 26
+    for_loop                       shift and go to state 27
+    if_else_statement              shift and go to state 28
+    expression                     shift and go to state 29
+    var_assign                     shift and go to state 30
+    print                          shift and go to state 31
+    increment                      shift and go to state 32
+    decrement                      shift and go to state 33
+    empty                          shift and go to state 35
+    if_statement                   shift and go to state 38
+    literal                        shift and go to state 39
+    function_call                  shift and go to state 40
+    variable                       shift and go to state 41
+    type                           shift and go to state 22
+    bool_literal                   shift and go to state 46
+    array                          shift and go to state 47
 
 state 35
 
-    (25) while_loop -> WHILE . LPAREN boolean_expr RPAREN LBRACE body RBRACE
+    (84) body -> empty .
 
-    LPAREN          shift and go to state 70
+    RBRACE          reduce using rule 84 (body -> empty .)
 
 
 state 36
 
-    (34) for_loop -> FOR . LPAREN for_assign SEMICOLON boolean_expr SEMICOLON for_iteration RPAREN LBRACE body RBRACE
+    (25) while_loop -> WHILE . LPAREN boolean_expr RPAREN LBRACE body RBRACE
 
-    LPAREN          shift and go to state 71
+    LPAREN          shift and go to state 72
 
 
 state 37
+
+    (34) for_loop -> FOR . LPAREN for_assign SEMICOLON boolean_expr SEMICOLON for_iteration RPAREN LBRACE body RBRACE
+
+    LPAREN          shift and go to state 73
+
+
+state 38
 
     (15) if_else_statement -> if_statement .
     (16) if_else_statement -> if_statement . else_if_statement else_statement
@@ -994,6 +1104,7 @@ state 37
     FOR             reduce using rule 15 (if_else_statement -> if_statement .)
     LPAREN          reduce using rule 15 (if_else_statement -> if_statement .)
     STD             reduce using rule 15 (if_else_statement -> if_statement .)
+    COMMENT         reduce using rule 15 (if_else_statement -> if_statement .)
     IF              reduce using rule 15 (if_else_statement -> if_statement .)
     NUMBER          reduce using rule 15 (if_else_statement -> if_statement .)
     STR             reduce using rule 15 (if_else_statement -> if_statement .)
@@ -1005,15 +1116,15 @@ state 37
     TRUE            reduce using rule 15 (if_else_statement -> if_statement .)
     FALSE           reduce using rule 15 (if_else_statement -> if_statement .)
     RBRACE          reduce using rule 15 (if_else_statement -> if_statement .)
-    ELSE            shift and go to state 74
+    ELSE            shift and go to state 76
 
   ! ELSE            [ reduce using rule 73 (empty -> .) ]
 
-    else_if_statement              shift and go to state 72
-    else_statement                 shift and go to state 73
-    empty                          shift and go to state 75
+    else_if_statement              shift and go to state 74
+    else_statement                 shift and go to state 75
+    empty                          shift and go to state 77
 
-state 38
+state 39
 
     (61) expression -> literal .
 
@@ -1035,7 +1146,7 @@ state 38
     OR              reduce using rule 61 (expression -> literal .)
 
 
-state 39
+state 40
 
     (62) expression -> function_call .
 
@@ -1057,7 +1168,7 @@ state 39
     OR              reduce using rule 62 (expression -> function_call .)
 
 
-state 40
+state 41
 
     (63) expression -> variable .
     (13) var_assign -> variable . ASSIGN expression
@@ -1069,30 +1180,30 @@ state 40
     SEMICOLON       reduce using rule 63 (expression -> variable .)
     DIVIDE          reduce using rule 63 (expression -> variable .)
     TIMES           reduce using rule 63 (expression -> variable .)
-    ASSIGN          shift and go to state 76
-    PLUS            shift and go to state 77
-    MINUS           shift and go to state 78
+    ASSIGN          shift and go to state 78
+    PLUS            shift and go to state 79
+    MINUS           shift and go to state 80
 
   ! PLUS            [ reduce using rule 63 (expression -> variable .) ]
   ! MINUS           [ reduce using rule 63 (expression -> variable .) ]
 
 
-state 41
+state 42
 
     (74) print -> STD . NAMESPACE COUT DLEFT expression
 
-    NAMESPACE       shift and go to state 79
+    NAMESPACE       shift and go to state 81
 
 
-state 42
+state 43
 
     (18) if_statement -> IF . LPAREN boolean_expr RPAREN LBRACE body RBRACE
     (19) if_statement -> IF . LPAREN boolean_expr RPAREN var_assign SEMICOLON
 
-    LPAREN          shift and go to state 80
+    LPAREN          shift and go to state 82
 
 
-state 43
+state 44
 
     (50) literal -> NUMBER .
 
@@ -1114,7 +1225,7 @@ state 43
     OR              reduce using rule 50 (literal -> NUMBER .)
 
 
-state 44
+state 45
 
     (51) literal -> STR .
 
@@ -1136,7 +1247,7 @@ state 44
     OR              reduce using rule 51 (literal -> STR .)
 
 
-state 45
+state 46
 
     (52) literal -> bool_literal .
 
@@ -1158,7 +1269,7 @@ state 45
     OR              reduce using rule 52 (literal -> bool_literal .)
 
 
-state 46
+state 47
 
     (12) variable -> array .
 
@@ -1181,7 +1292,7 @@ state 46
     OR              reduce using rule 12 (variable -> array .)
 
 
-state 47
+state 48
 
     (53) bool_literal -> TRUE .
 
@@ -1203,7 +1314,7 @@ state 47
     OR              reduce using rule 53 (bool_literal -> TRUE .)
 
 
-state 48
+state 49
 
     (54) bool_literal -> FALSE .
 
@@ -1225,14 +1336,14 @@ state 48
     OR              reduce using rule 54 (bool_literal -> FALSE .)
 
 
-state 49
+state 50
 
     (14) var_assign -> type variable . ASSIGN expression
 
-    ASSIGN          shift and go to state 81
+    ASSIGN          shift and go to state 83
 
 
-state 50
+state 51
 
     (11) variable -> ID .
     (10) array -> ID . brackets
@@ -1241,11 +1352,11 @@ state 50
 
     ASSIGN          reduce using rule 11 (variable -> ID .)
     COMMA           reduce using rule 11 (variable -> ID .)
-    LBRACKET        shift and go to state 53
+    LBRACKET        shift and go to state 54
 
-    brackets                       shift and go to state 52
+    brackets                       shift and go to state 53
 
-state 51
+state 52
 
     (72) function_call -> ID LPAREN . call_args RPAREN
     (70) call_args -> . variable COMMA call_args
@@ -1255,15 +1366,15 @@ state 51
     (73) empty -> .
     (10) array -> . ID brackets
 
-    ID              shift and go to state 50
+    ID              shift and go to state 51
     RPAREN          reduce using rule 73 (empty -> .)
 
-    call_args                      shift and go to state 82
-    variable                       shift and go to state 83
-    empty                          shift and go to state 84
-    array                          shift and go to state 46
+    call_args                      shift and go to state 84
+    variable                       shift and go to state 85
+    empty                          shift and go to state 86
+    array                          shift and go to state 47
 
-state 52
+state 53
 
     (10) array -> ID brackets .
 
@@ -1286,7 +1397,7 @@ state 52
     OR              reduce using rule 10 (array -> ID brackets .)
 
 
-state 53
+state 54
 
     (8) brackets -> LBRACKET . index RBRACKET brackets
     (9) brackets -> LBRACKET . index RBRACKET
@@ -1308,22 +1419,22 @@ state 53
     (54) bool_literal -> . FALSE
     (72) function_call -> . ID LPAREN call_args RPAREN
 
-    ID              shift and go to state 89
-    NUMBER          shift and go to state 43
-    STR             shift and go to state 44
+    ID              shift and go to state 91
+    NUMBER          shift and go to state 44
+    STR             shift and go to state 45
     LPAREN          shift and go to state 24
-    TRUE            shift and go to state 47
-    FALSE           shift and go to state 48
+    TRUE            shift and go to state 48
+    FALSE           shift and go to state 49
 
-    index                          shift and go to state 85
-    variable                       shift and go to state 86
-    literal                        shift and go to state 87
-    expression                     shift and go to state 88
-    array                          shift and go to state 46
-    bool_literal                   shift and go to state 45
-    function_call                  shift and go to state 39
+    index                          shift and go to state 87
+    variable                       shift and go to state 88
+    literal                        shift and go to state 89
+    expression                     shift and go to state 90
+    array                          shift and go to state 47
+    bool_literal                   shift and go to state 46
+    function_call                  shift and go to state 40
 
-state 54
+state 55
 
     (60) expression -> LPAREN expression . RPAREN
     (59) expression -> expression . operator expression
@@ -1332,15 +1443,15 @@ state 54
     (40) operator -> . DIVIDE
     (41) operator -> . TIMES
 
-    RPAREN          shift and go to state 90
-    PLUS            shift and go to state 62
-    MINUS           shift and go to state 63
-    DIVIDE          shift and go to state 64
-    TIMES           shift and go to state 65
+    RPAREN          shift and go to state 92
+    PLUS            shift and go to state 63
+    MINUS           shift and go to state 64
+    DIVIDE          shift and go to state 65
+    TIMES           shift and go to state 66
 
-    operator                       shift and go to state 61
+    operator                       shift and go to state 62
 
-state 55
+state 56
 
     (63) expression -> variable .
 
@@ -1362,7 +1473,7 @@ state 55
     OR              reduce using rule 63 (expression -> variable .)
 
 
-state 56
+state 57
 
     (69) function -> type ID LPAREN RPAREN LBRACE body RBRACE .
 
@@ -1375,28 +1486,28 @@ state 56
     $end            reduce using rule 69 (function -> type ID LPAREN RPAREN LBRACE body RBRACE .)
 
 
-state 57
+state 58
 
     (75) body -> while_loop body .
 
     RBRACE          reduce using rule 75 (body -> while_loop body .)
 
 
-state 58
+state 59
 
     (76) body -> for_loop body .
 
     RBRACE          reduce using rule 76 (body -> for_loop body .)
 
 
-state 59
+state 60
 
     (77) body -> if_else_statement body .
 
     RBRACE          reduce using rule 77 (body -> if_else_statement body .)
 
 
-state 60
+state 61
 
     (78) body -> expression SEMICOLON . body
     (75) body -> . while_loop body
@@ -1407,7 +1518,8 @@ state 60
     (80) body -> . print SEMICOLON body
     (81) body -> . increment SEMICOLON body
     (82) body -> . decrement SEMICOLON body
-    (83) body -> . empty
+    (83) body -> . comment body
+    (84) body -> . empty
     (25) while_loop -> . WHILE LPAREN boolean_expr RPAREN LBRACE body RBRACE
     (34) for_loop -> . FOR LPAREN for_assign SEMICOLON boolean_expr SEMICOLON for_iteration RPAREN LBRACE body RBRACE
     (15) if_else_statement -> . if_statement
@@ -1423,6 +1535,7 @@ state 60
     (74) print -> . STD NAMESPACE COUT DLEFT expression
     (29) increment -> . variable PLUS PLUS
     (30) decrement -> . variable MINUS MINUS
+    (35) comment -> . COMMENT
     (73) empty -> .
     (18) if_statement -> . IF LPAREN boolean_expr RPAREN LBRACE body RBRACE
     (19) if_statement -> . IF LPAREN boolean_expr RPAREN var_assign SEMICOLON
@@ -1440,24 +1553,25 @@ state 60
     (54) bool_literal -> . FALSE
     (10) array -> . ID brackets
 
-    WHILE           shift and go to state 35
-    FOR             shift and go to state 36
+    WHILE           shift and go to state 36
+    FOR             shift and go to state 37
     LPAREN          shift and go to state 24
-    STD             shift and go to state 41
+    STD             shift and go to state 42
+    COMMENT         shift and go to state 8
     RBRACE          reduce using rule 73 (empty -> .)
-    IF              shift and go to state 42
-    NUMBER          shift and go to state 43
-    STR             shift and go to state 44
+    IF              shift and go to state 43
+    NUMBER          shift and go to state 44
+    STR             shift and go to state 45
     ID              shift and go to state 23
     INT             shift and go to state 9
     DOUBLE          shift and go to state 10
     STRING          shift and go to state 11
     BOOL            shift and go to state 12
-    TRUE            shift and go to state 47
-    FALSE           shift and go to state 48
+    TRUE            shift and go to state 48
+    FALSE           shift and go to state 49
 
     expression                     shift and go to state 29
-    body                           shift and go to state 91
+    body                           shift and go to state 93
     while_loop                     shift and go to state 26
     for_loop                       shift and go to state 27
     if_else_statement              shift and go to state 28
@@ -1465,16 +1579,17 @@ state 60
     print                          shift and go to state 31
     increment                      shift and go to state 32
     decrement                      shift and go to state 33
-    empty                          shift and go to state 34
-    if_statement                   shift and go to state 37
-    literal                        shift and go to state 38
-    function_call                  shift and go to state 39
-    variable                       shift and go to state 40
+    comment                        shift and go to state 34
+    empty                          shift and go to state 35
+    if_statement                   shift and go to state 38
+    literal                        shift and go to state 39
+    function_call                  shift and go to state 40
+    variable                       shift and go to state 41
     type                           shift and go to state 22
-    bool_literal                   shift and go to state 45
-    array                          shift and go to state 46
+    bool_literal                   shift and go to state 46
+    array                          shift and go to state 47
 
-state 61
+state 62
 
     (59) expression -> expression operator . expression
     (59) expression -> . expression operator expression
@@ -1493,20 +1608,20 @@ state 61
     (10) array -> . ID brackets
 
     LPAREN          shift and go to state 24
-    NUMBER          shift and go to state 43
-    STR             shift and go to state 44
+    NUMBER          shift and go to state 44
+    STR             shift and go to state 45
     ID              shift and go to state 23
-    TRUE            shift and go to state 47
-    FALSE           shift and go to state 48
+    TRUE            shift and go to state 48
+    FALSE           shift and go to state 49
 
-    expression                     shift and go to state 92
-    literal                        shift and go to state 38
-    function_call                  shift and go to state 39
-    variable                       shift and go to state 55
-    bool_literal                   shift and go to state 45
-    array                          shift and go to state 46
+    expression                     shift and go to state 94
+    literal                        shift and go to state 39
+    function_call                  shift and go to state 40
+    variable                       shift and go to state 56
+    bool_literal                   shift and go to state 46
+    array                          shift and go to state 47
 
-state 62
+state 63
 
     (38) operator -> PLUS .
 
@@ -1518,7 +1633,7 @@ state 62
     FALSE           reduce using rule 38 (operator -> PLUS .)
 
 
-state 63
+state 64
 
     (39) operator -> MINUS .
 
@@ -1530,7 +1645,7 @@ state 63
     FALSE           reduce using rule 39 (operator -> MINUS .)
 
 
-state 64
+state 65
 
     (40) operator -> DIVIDE .
 
@@ -1542,7 +1657,7 @@ state 64
     FALSE           reduce using rule 40 (operator -> DIVIDE .)
 
 
-state 65
+state 66
 
     (41) operator -> TIMES .
 
@@ -1554,7 +1669,7 @@ state 65
     FALSE           reduce using rule 41 (operator -> TIMES .)
 
 
-state 66
+state 67
 
     (79) body -> var_assign SEMICOLON . body
     (75) body -> . while_loop body
@@ -1565,7 +1680,8 @@ state 66
     (80) body -> . print SEMICOLON body
     (81) body -> . increment SEMICOLON body
     (82) body -> . decrement SEMICOLON body
-    (83) body -> . empty
+    (83) body -> . comment body
+    (84) body -> . empty
     (25) while_loop -> . WHILE LPAREN boolean_expr RPAREN LBRACE body RBRACE
     (34) for_loop -> . FOR LPAREN for_assign SEMICOLON boolean_expr SEMICOLON for_iteration RPAREN LBRACE body RBRACE
     (15) if_else_statement -> . if_statement
@@ -1581,6 +1697,7 @@ state 66
     (74) print -> . STD NAMESPACE COUT DLEFT expression
     (29) increment -> . variable PLUS PLUS
     (30) decrement -> . variable MINUS MINUS
+    (35) comment -> . COMMENT
     (73) empty -> .
     (18) if_statement -> . IF LPAREN boolean_expr RPAREN LBRACE body RBRACE
     (19) if_statement -> . IF LPAREN boolean_expr RPAREN var_assign SEMICOLON
@@ -1598,24 +1715,25 @@ state 66
     (54) bool_literal -> . FALSE
     (10) array -> . ID brackets
 
-    WHILE           shift and go to state 35
-    FOR             shift and go to state 36
+    WHILE           shift and go to state 36
+    FOR             shift and go to state 37
     LPAREN          shift and go to state 24
-    STD             shift and go to state 41
+    STD             shift and go to state 42
+    COMMENT         shift and go to state 8
     RBRACE          reduce using rule 73 (empty -> .)
-    IF              shift and go to state 42
-    NUMBER          shift and go to state 43
-    STR             shift and go to state 44
+    IF              shift and go to state 43
+    NUMBER          shift and go to state 44
+    STR             shift and go to state 45
     ID              shift and go to state 23
     INT             shift and go to state 9
     DOUBLE          shift and go to state 10
     STRING          shift and go to state 11
     BOOL            shift and go to state 12
-    TRUE            shift and go to state 47
-    FALSE           shift and go to state 48
+    TRUE            shift and go to state 48
+    FALSE           shift and go to state 49
 
     var_assign                     shift and go to state 30
-    body                           shift and go to state 93
+    body                           shift and go to state 95
     while_loop                     shift and go to state 26
     for_loop                       shift and go to state 27
     if_else_statement              shift and go to state 28
@@ -1623,16 +1741,17 @@ state 66
     print                          shift and go to state 31
     increment                      shift and go to state 32
     decrement                      shift and go to state 33
-    empty                          shift and go to state 34
-    if_statement                   shift and go to state 37
-    literal                        shift and go to state 38
-    function_call                  shift and go to state 39
-    variable                       shift and go to state 40
+    comment                        shift and go to state 34
+    empty                          shift and go to state 35
+    if_statement                   shift and go to state 38
+    literal                        shift and go to state 39
+    function_call                  shift and go to state 40
+    variable                       shift and go to state 41
     type                           shift and go to state 22
-    bool_literal                   shift and go to state 45
-    array                          shift and go to state 46
+    bool_literal                   shift and go to state 46
+    array                          shift and go to state 47
 
-state 67
+state 68
 
     (80) body -> print SEMICOLON . body
     (75) body -> . while_loop body
@@ -1643,7 +1762,8 @@ state 67
     (80) body -> . print SEMICOLON body
     (81) body -> . increment SEMICOLON body
     (82) body -> . decrement SEMICOLON body
-    (83) body -> . empty
+    (83) body -> . comment body
+    (84) body -> . empty
     (25) while_loop -> . WHILE LPAREN boolean_expr RPAREN LBRACE body RBRACE
     (34) for_loop -> . FOR LPAREN for_assign SEMICOLON boolean_expr SEMICOLON for_iteration RPAREN LBRACE body RBRACE
     (15) if_else_statement -> . if_statement
@@ -1659,6 +1779,7 @@ state 67
     (74) print -> . STD NAMESPACE COUT DLEFT expression
     (29) increment -> . variable PLUS PLUS
     (30) decrement -> . variable MINUS MINUS
+    (35) comment -> . COMMENT
     (73) empty -> .
     (18) if_statement -> . IF LPAREN boolean_expr RPAREN LBRACE body RBRACE
     (19) if_statement -> . IF LPAREN boolean_expr RPAREN var_assign SEMICOLON
@@ -1676,24 +1797,25 @@ state 67
     (54) bool_literal -> . FALSE
     (10) array -> . ID brackets
 
-    WHILE           shift and go to state 35
-    FOR             shift and go to state 36
+    WHILE           shift and go to state 36
+    FOR             shift and go to state 37
     LPAREN          shift and go to state 24
-    STD             shift and go to state 41
+    STD             shift and go to state 42
+    COMMENT         shift and go to state 8
     RBRACE          reduce using rule 73 (empty -> .)
-    IF              shift and go to state 42
-    NUMBER          shift and go to state 43
-    STR             shift and go to state 44
+    IF              shift and go to state 43
+    NUMBER          shift and go to state 44
+    STR             shift and go to state 45
     ID              shift and go to state 23
     INT             shift and go to state 9
     DOUBLE          shift and go to state 10
     STRING          shift and go to state 11
     BOOL            shift and go to state 12
-    TRUE            shift and go to state 47
-    FALSE           shift and go to state 48
+    TRUE            shift and go to state 48
+    FALSE           shift and go to state 49
 
     print                          shift and go to state 31
-    body                           shift and go to state 94
+    body                           shift and go to state 96
     while_loop                     shift and go to state 26
     for_loop                       shift and go to state 27
     if_else_statement              shift and go to state 28
@@ -1701,16 +1823,17 @@ state 67
     var_assign                     shift and go to state 30
     increment                      shift and go to state 32
     decrement                      shift and go to state 33
-    empty                          shift and go to state 34
-    if_statement                   shift and go to state 37
-    literal                        shift and go to state 38
-    function_call                  shift and go to state 39
-    variable                       shift and go to state 40
+    comment                        shift and go to state 34
+    empty                          shift and go to state 35
+    if_statement                   shift and go to state 38
+    literal                        shift and go to state 39
+    function_call                  shift and go to state 40
+    variable                       shift and go to state 41
     type                           shift and go to state 22
-    bool_literal                   shift and go to state 45
-    array                          shift and go to state 46
+    bool_literal                   shift and go to state 46
+    array                          shift and go to state 47
 
-state 68
+state 69
 
     (81) body -> increment SEMICOLON . body
     (75) body -> . while_loop body
@@ -1721,7 +1844,8 @@ state 68
     (80) body -> . print SEMICOLON body
     (81) body -> . increment SEMICOLON body
     (82) body -> . decrement SEMICOLON body
-    (83) body -> . empty
+    (83) body -> . comment body
+    (84) body -> . empty
     (25) while_loop -> . WHILE LPAREN boolean_expr RPAREN LBRACE body RBRACE
     (34) for_loop -> . FOR LPAREN for_assign SEMICOLON boolean_expr SEMICOLON for_iteration RPAREN LBRACE body RBRACE
     (15) if_else_statement -> . if_statement
@@ -1737,6 +1861,7 @@ state 68
     (74) print -> . STD NAMESPACE COUT DLEFT expression
     (29) increment -> . variable PLUS PLUS
     (30) decrement -> . variable MINUS MINUS
+    (35) comment -> . COMMENT
     (73) empty -> .
     (18) if_statement -> . IF LPAREN boolean_expr RPAREN LBRACE body RBRACE
     (19) if_statement -> . IF LPAREN boolean_expr RPAREN var_assign SEMICOLON
@@ -1754,24 +1879,25 @@ state 68
     (54) bool_literal -> . FALSE
     (10) array -> . ID brackets
 
-    WHILE           shift and go to state 35
-    FOR             shift and go to state 36
+    WHILE           shift and go to state 36
+    FOR             shift and go to state 37
     LPAREN          shift and go to state 24
-    STD             shift and go to state 41
+    STD             shift and go to state 42
+    COMMENT         shift and go to state 8
     RBRACE          reduce using rule 73 (empty -> .)
-    IF              shift and go to state 42
-    NUMBER          shift and go to state 43
-    STR             shift and go to state 44
+    IF              shift and go to state 43
+    NUMBER          shift and go to state 44
+    STR             shift and go to state 45
     ID              shift and go to state 23
     INT             shift and go to state 9
     DOUBLE          shift and go to state 10
     STRING          shift and go to state 11
     BOOL            shift and go to state 12
-    TRUE            shift and go to state 47
-    FALSE           shift and go to state 48
+    TRUE            shift and go to state 48
+    FALSE           shift and go to state 49
 
     increment                      shift and go to state 32
-    body                           shift and go to state 95
+    body                           shift and go to state 97
     while_loop                     shift and go to state 26
     for_loop                       shift and go to state 27
     if_else_statement              shift and go to state 28
@@ -1779,16 +1905,17 @@ state 68
     var_assign                     shift and go to state 30
     print                          shift and go to state 31
     decrement                      shift and go to state 33
-    empty                          shift and go to state 34
-    if_statement                   shift and go to state 37
-    literal                        shift and go to state 38
-    function_call                  shift and go to state 39
-    variable                       shift and go to state 40
+    comment                        shift and go to state 34
+    empty                          shift and go to state 35
+    if_statement                   shift and go to state 38
+    literal                        shift and go to state 39
+    function_call                  shift and go to state 40
+    variable                       shift and go to state 41
     type                           shift and go to state 22
-    bool_literal                   shift and go to state 45
-    array                          shift and go to state 46
+    bool_literal                   shift and go to state 46
+    array                          shift and go to state 47
 
-state 69
+state 70
 
     (82) body -> decrement SEMICOLON . body
     (75) body -> . while_loop body
@@ -1799,7 +1926,8 @@ state 69
     (80) body -> . print SEMICOLON body
     (81) body -> . increment SEMICOLON body
     (82) body -> . decrement SEMICOLON body
-    (83) body -> . empty
+    (83) body -> . comment body
+    (84) body -> . empty
     (25) while_loop -> . WHILE LPAREN boolean_expr RPAREN LBRACE body RBRACE
     (34) for_loop -> . FOR LPAREN for_assign SEMICOLON boolean_expr SEMICOLON for_iteration RPAREN LBRACE body RBRACE
     (15) if_else_statement -> . if_statement
@@ -1815,6 +1943,7 @@ state 69
     (74) print -> . STD NAMESPACE COUT DLEFT expression
     (29) increment -> . variable PLUS PLUS
     (30) decrement -> . variable MINUS MINUS
+    (35) comment -> . COMMENT
     (73) empty -> .
     (18) if_statement -> . IF LPAREN boolean_expr RPAREN LBRACE body RBRACE
     (19) if_statement -> . IF LPAREN boolean_expr RPAREN var_assign SEMICOLON
@@ -1832,24 +1961,25 @@ state 69
     (54) bool_literal -> . FALSE
     (10) array -> . ID brackets
 
-    WHILE           shift and go to state 35
-    FOR             shift and go to state 36
+    WHILE           shift and go to state 36
+    FOR             shift and go to state 37
     LPAREN          shift and go to state 24
-    STD             shift and go to state 41
+    STD             shift and go to state 42
+    COMMENT         shift and go to state 8
     RBRACE          reduce using rule 73 (empty -> .)
-    IF              shift and go to state 42
-    NUMBER          shift and go to state 43
-    STR             shift and go to state 44
+    IF              shift and go to state 43
+    NUMBER          shift and go to state 44
+    STR             shift and go to state 45
     ID              shift and go to state 23
     INT             shift and go to state 9
     DOUBLE          shift and go to state 10
     STRING          shift and go to state 11
     BOOL            shift and go to state 12
-    TRUE            shift and go to state 47
-    FALSE           shift and go to state 48
+    TRUE            shift and go to state 48
+    FALSE           shift and go to state 49
 
     decrement                      shift and go to state 33
-    body                           shift and go to state 96
+    body                           shift and go to state 98
     while_loop                     shift and go to state 26
     for_loop                       shift and go to state 27
     if_else_statement              shift and go to state 28
@@ -1857,16 +1987,24 @@ state 69
     var_assign                     shift and go to state 30
     print                          shift and go to state 31
     increment                      shift and go to state 32
-    empty                          shift and go to state 34
-    if_statement                   shift and go to state 37
-    literal                        shift and go to state 38
-    function_call                  shift and go to state 39
-    variable                       shift and go to state 40
+    comment                        shift and go to state 34
+    empty                          shift and go to state 35
+    if_statement                   shift and go to state 38
+    literal                        shift and go to state 39
+    function_call                  shift and go to state 40
+    variable                       shift and go to state 41
     type                           shift and go to state 22
-    bool_literal                   shift and go to state 45
-    array                          shift and go to state 46
+    bool_literal                   shift and go to state 46
+    array                          shift and go to state 47
 
-state 70
+state 71
+
+    (83) body -> comment body .
+
+    RBRACE          reduce using rule 83 (body -> comment body .)
+
+
+state 72
 
     (25) while_loop -> WHILE LPAREN . boolean_expr RPAREN LBRACE body RBRACE
     (64) boolean_expr -> . expression compare_op expression
@@ -1889,23 +2027,23 @@ state 70
     (12) variable -> . array
     (10) array -> . ID brackets
 
-    NOT             shift and go to state 100
-    LPAREN          shift and go to state 97
-    TRUE            shift and go to state 47
-    FALSE           shift and go to state 48
-    NUMBER          shift and go to state 43
-    STR             shift and go to state 44
+    NOT             shift and go to state 102
+    LPAREN          shift and go to state 99
+    TRUE            shift and go to state 48
+    FALSE           shift and go to state 49
+    NUMBER          shift and go to state 44
+    STR             shift and go to state 45
     ID              shift and go to state 23
 
-    boolean_expr                   shift and go to state 98
-    expression                     shift and go to state 99
-    bool_literal                   shift and go to state 101
-    literal                        shift and go to state 38
-    function_call                  shift and go to state 39
-    variable                       shift and go to state 55
-    array                          shift and go to state 46
+    boolean_expr                   shift and go to state 100
+    expression                     shift and go to state 101
+    bool_literal                   shift and go to state 103
+    literal                        shift and go to state 39
+    function_call                  shift and go to state 40
+    variable                       shift and go to state 56
+    array                          shift and go to state 47
 
-state 71
+state 73
 
     (34) for_loop -> FOR LPAREN . for_assign SEMICOLON boolean_expr SEMICOLON for_iteration RPAREN LBRACE body RBRACE
     (26) for_assign -> . var_assign COMMA for_assign
@@ -1923,30 +2061,30 @@ state 71
     (10) array -> . ID brackets
 
     SEMICOLON       reduce using rule 73 (empty -> .)
-    ID              shift and go to state 50
+    ID              shift and go to state 51
     INT             shift and go to state 9
     DOUBLE          shift and go to state 10
     STRING          shift and go to state 11
     BOOL            shift and go to state 12
 
-    for_assign                     shift and go to state 102
-    var_assign                     shift and go to state 103
-    empty                          shift and go to state 104
-    variable                       shift and go to state 105
+    for_assign                     shift and go to state 104
+    var_assign                     shift and go to state 105
+    empty                          shift and go to state 106
+    variable                       shift and go to state 107
     type                           shift and go to state 22
-    array                          shift and go to state 46
+    array                          shift and go to state 47
 
-state 72
+state 74
 
     (16) if_else_statement -> if_statement else_if_statement . else_statement
     (23) else_statement -> . ELSE LBRACE body RBRACE
     (24) else_statement -> . ELSE var_assign SEMICOLON
 
-    ELSE            shift and go to state 107
+    ELSE            shift and go to state 109
 
-    else_statement                 shift and go to state 106
+    else_statement                 shift and go to state 108
 
-state 73
+state 75
 
     (17) if_else_statement -> if_statement else_statement .
 
@@ -1954,6 +2092,7 @@ state 73
     FOR             reduce using rule 17 (if_else_statement -> if_statement else_statement .)
     LPAREN          reduce using rule 17 (if_else_statement -> if_statement else_statement .)
     STD             reduce using rule 17 (if_else_statement -> if_statement else_statement .)
+    COMMENT         reduce using rule 17 (if_else_statement -> if_statement else_statement .)
     IF              reduce using rule 17 (if_else_statement -> if_statement else_statement .)
     NUMBER          reduce using rule 17 (if_else_statement -> if_statement else_statement .)
     STR             reduce using rule 17 (if_else_statement -> if_statement else_statement .)
@@ -1967,7 +2106,7 @@ state 73
     RBRACE          reduce using rule 17 (if_else_statement -> if_statement else_statement .)
 
 
-state 74
+state 76
 
     (20) else_if_statement -> ELSE . IF LPAREN boolean_expr RPAREN LBRACE body RBRACE else_if_statement
     (21) else_if_statement -> ELSE . IF LPAREN boolean_expr RPAREN var_assign SEMICOLON
@@ -1983,27 +2122,27 @@ state 74
     (58) type -> . BOOL
     (10) array -> . ID brackets
 
-    IF              shift and go to state 108
-    LBRACE          shift and go to state 109
-    ID              shift and go to state 50
+    IF              shift and go to state 110
+    LBRACE          shift and go to state 111
+    ID              shift and go to state 51
     INT             shift and go to state 9
     DOUBLE          shift and go to state 10
     STRING          shift and go to state 11
     BOOL            shift and go to state 12
 
-    var_assign                     shift and go to state 110
-    variable                       shift and go to state 105
+    var_assign                     shift and go to state 112
+    variable                       shift and go to state 107
     type                           shift and go to state 22
-    array                          shift and go to state 46
+    array                          shift and go to state 47
 
-state 75
+state 77
 
     (22) else_if_statement -> empty .
 
     ELSE            reduce using rule 22 (else_if_statement -> empty .)
 
 
-state 76
+state 78
 
     (13) var_assign -> variable ASSIGN . expression
     (59) expression -> . expression operator expression
@@ -2022,41 +2161,41 @@ state 76
     (10) array -> . ID brackets
 
     LPAREN          shift and go to state 24
-    NUMBER          shift and go to state 43
-    STR             shift and go to state 44
+    NUMBER          shift and go to state 44
+    STR             shift and go to state 45
     ID              shift and go to state 23
-    TRUE            shift and go to state 47
-    FALSE           shift and go to state 48
+    TRUE            shift and go to state 48
+    FALSE           shift and go to state 49
 
-    variable                       shift and go to state 55
-    expression                     shift and go to state 111
-    literal                        shift and go to state 38
-    function_call                  shift and go to state 39
-    bool_literal                   shift and go to state 45
-    array                          shift and go to state 46
-
-state 77
-
-    (29) increment -> variable PLUS . PLUS
-
-    PLUS            shift and go to state 112
-
-
-state 78
-
-    (30) decrement -> variable MINUS . MINUS
-
-    MINUS           shift and go to state 113
-
+    variable                       shift and go to state 56
+    expression                     shift and go to state 113
+    literal                        shift and go to state 39
+    function_call                  shift and go to state 40
+    bool_literal                   shift and go to state 46
+    array                          shift and go to state 47
 
 state 79
 
-    (74) print -> STD NAMESPACE . COUT DLEFT expression
+    (29) increment -> variable PLUS . PLUS
 
-    COUT            shift and go to state 114
+    PLUS            shift and go to state 114
 
 
 state 80
+
+    (30) decrement -> variable MINUS . MINUS
+
+    MINUS           shift and go to state 115
+
+
+state 81
+
+    (74) print -> STD NAMESPACE . COUT DLEFT expression
+
+    COUT            shift and go to state 116
+
+
+state 82
 
     (18) if_statement -> IF LPAREN . boolean_expr RPAREN LBRACE body RBRACE
     (19) if_statement -> IF LPAREN . boolean_expr RPAREN var_assign SEMICOLON
@@ -2080,23 +2219,23 @@ state 80
     (12) variable -> . array
     (10) array -> . ID brackets
 
-    NOT             shift and go to state 100
-    LPAREN          shift and go to state 97
-    TRUE            shift and go to state 47
-    FALSE           shift and go to state 48
-    NUMBER          shift and go to state 43
-    STR             shift and go to state 44
+    NOT             shift and go to state 102
+    LPAREN          shift and go to state 99
+    TRUE            shift and go to state 48
+    FALSE           shift and go to state 49
+    NUMBER          shift and go to state 44
+    STR             shift and go to state 45
     ID              shift and go to state 23
 
-    boolean_expr                   shift and go to state 115
-    expression                     shift and go to state 99
-    bool_literal                   shift and go to state 101
-    literal                        shift and go to state 38
-    function_call                  shift and go to state 39
-    variable                       shift and go to state 55
-    array                          shift and go to state 46
+    boolean_expr                   shift and go to state 117
+    expression                     shift and go to state 101
+    bool_literal                   shift and go to state 103
+    literal                        shift and go to state 39
+    function_call                  shift and go to state 40
+    variable                       shift and go to state 56
+    array                          shift and go to state 47
 
-state 81
+state 83
 
     (14) var_assign -> type variable ASSIGN . expression
     (59) expression -> . expression operator expression
@@ -2115,49 +2254,49 @@ state 81
     (10) array -> . ID brackets
 
     LPAREN          shift and go to state 24
-    NUMBER          shift and go to state 43
-    STR             shift and go to state 44
+    NUMBER          shift and go to state 44
+    STR             shift and go to state 45
     ID              shift and go to state 23
-    TRUE            shift and go to state 47
-    FALSE           shift and go to state 48
+    TRUE            shift and go to state 48
+    FALSE           shift and go to state 49
 
-    variable                       shift and go to state 55
-    expression                     shift and go to state 116
-    literal                        shift and go to state 38
-    function_call                  shift and go to state 39
-    bool_literal                   shift and go to state 45
-    array                          shift and go to state 46
+    variable                       shift and go to state 56
+    expression                     shift and go to state 118
+    literal                        shift and go to state 39
+    function_call                  shift and go to state 40
+    bool_literal                   shift and go to state 46
+    array                          shift and go to state 47
 
-state 82
+state 84
 
     (72) function_call -> ID LPAREN call_args . RPAREN
 
-    RPAREN          shift and go to state 117
+    RPAREN          shift and go to state 119
 
 
-state 83
+state 85
 
     (70) call_args -> variable . COMMA call_args
 
-    COMMA           shift and go to state 118
+    COMMA           shift and go to state 120
 
 
-state 84
+state 86
 
     (71) call_args -> empty .
 
     RPAREN          reduce using rule 71 (call_args -> empty .)
 
 
-state 85
+state 87
 
     (8) brackets -> LBRACKET index . RBRACKET brackets
     (9) brackets -> LBRACKET index . RBRACKET
 
-    RBRACKET        shift and go to state 119
+    RBRACKET        shift and go to state 121
 
 
-state 86
+state 88
 
     (5) index -> variable .
     (63) expression -> variable .
@@ -2172,7 +2311,7 @@ state 86
   ! RBRACKET        [ reduce using rule 63 (expression -> variable .) ]
 
 
-state 87
+state 89
 
     (6) index -> literal .
     (61) expression -> literal .
@@ -2187,7 +2326,7 @@ state 87
   ! RBRACKET        [ reduce using rule 61 (expression -> literal .) ]
 
 
-state 88
+state 90
 
     (7) index -> expression .
     (59) expression -> expression . operator expression
@@ -2197,14 +2336,14 @@ state 88
     (41) operator -> . TIMES
 
     RBRACKET        reduce using rule 7 (index -> expression .)
-    PLUS            shift and go to state 62
-    MINUS           shift and go to state 63
-    DIVIDE          shift and go to state 64
-    TIMES           shift and go to state 65
+    PLUS            shift and go to state 63
+    MINUS           shift and go to state 64
+    DIVIDE          shift and go to state 65
+    TIMES           shift and go to state 66
 
-    operator                       shift and go to state 61
+    operator                       shift and go to state 62
 
-state 89
+state 91
 
     (11) variable -> ID .
     (10) array -> ID . brackets
@@ -2217,12 +2356,12 @@ state 89
     MINUS           reduce using rule 11 (variable -> ID .)
     DIVIDE          reduce using rule 11 (variable -> ID .)
     TIMES           reduce using rule 11 (variable -> ID .)
-    LPAREN          shift and go to state 51
-    LBRACKET        shift and go to state 53
+    LPAREN          shift and go to state 52
+    LBRACKET        shift and go to state 54
 
-    brackets                       shift and go to state 52
+    brackets                       shift and go to state 53
 
-state 90
+state 92
 
     (60) expression -> LPAREN expression RPAREN .
 
@@ -2244,14 +2383,14 @@ state 90
     OR              reduce using rule 60 (expression -> LPAREN expression RPAREN .)
 
 
-state 91
+state 93
 
     (78) body -> expression SEMICOLON body .
 
     RBRACE          reduce using rule 78 (body -> expression SEMICOLON body .)
 
 
-state 92
+state 94
 
     (59) expression -> expression operator expression .
     (59) expression -> expression . operator expression
@@ -2276,47 +2415,47 @@ state 92
     COMMA           reduce using rule 59 (expression -> expression operator expression .)
     AND             reduce using rule 59 (expression -> expression operator expression .)
     OR              reduce using rule 59 (expression -> expression operator expression .)
-    PLUS            shift and go to state 62
-    MINUS           shift and go to state 63
-    DIVIDE          shift and go to state 64
-    TIMES           shift and go to state 65
+    PLUS            shift and go to state 63
+    MINUS           shift and go to state 64
+    DIVIDE          shift and go to state 65
+    TIMES           shift and go to state 66
 
   ! PLUS            [ reduce using rule 59 (expression -> expression operator expression .) ]
   ! MINUS           [ reduce using rule 59 (expression -> expression operator expression .) ]
   ! DIVIDE          [ reduce using rule 59 (expression -> expression operator expression .) ]
   ! TIMES           [ reduce using rule 59 (expression -> expression operator expression .) ]
 
-    operator                       shift and go to state 61
+    operator                       shift and go to state 62
 
-state 93
+state 95
 
     (79) body -> var_assign SEMICOLON body .
 
     RBRACE          reduce using rule 79 (body -> var_assign SEMICOLON body .)
 
 
-state 94
+state 96
 
     (80) body -> print SEMICOLON body .
 
     RBRACE          reduce using rule 80 (body -> print SEMICOLON body .)
 
 
-state 95
+state 97
 
     (81) body -> increment SEMICOLON body .
 
     RBRACE          reduce using rule 81 (body -> increment SEMICOLON body .)
 
 
-state 96
+state 98
 
     (82) body -> decrement SEMICOLON body .
 
     RBRACE          reduce using rule 82 (body -> decrement SEMICOLON body .)
 
 
-state 97
+state 99
 
     (67) boolean_expr -> LPAREN . boolean_expr RPAREN
     (60) expression -> LPAREN . expression RPAREN
@@ -2340,36 +2479,36 @@ state 97
     (12) variable -> . array
     (10) array -> . ID brackets
 
-    NOT             shift and go to state 100
-    LPAREN          shift and go to state 97
-    TRUE            shift and go to state 47
-    FALSE           shift and go to state 48
-    NUMBER          shift and go to state 43
-    STR             shift and go to state 44
+    NOT             shift and go to state 102
+    LPAREN          shift and go to state 99
+    TRUE            shift and go to state 48
+    FALSE           shift and go to state 49
+    NUMBER          shift and go to state 44
+    STR             shift and go to state 45
     ID              shift and go to state 23
 
-    boolean_expr                   shift and go to state 120
-    expression                     shift and go to state 121
-    bool_literal                   shift and go to state 101
-    literal                        shift and go to state 38
-    function_call                  shift and go to state 39
-    variable                       shift and go to state 55
-    array                          shift and go to state 46
+    boolean_expr                   shift and go to state 122
+    expression                     shift and go to state 123
+    bool_literal                   shift and go to state 103
+    literal                        shift and go to state 39
+    function_call                  shift and go to state 40
+    variable                       shift and go to state 56
+    array                          shift and go to state 47
 
-state 98
+state 100
 
     (25) while_loop -> WHILE LPAREN boolean_expr . RPAREN LBRACE body RBRACE
     (66) boolean_expr -> boolean_expr . bool_op boolean_expr
     (42) bool_op -> . AND
     (43) bool_op -> . OR
 
-    RPAREN          shift and go to state 122
-    AND             shift and go to state 124
-    OR              shift and go to state 125
+    RPAREN          shift and go to state 124
+    AND             shift and go to state 126
+    OR              shift and go to state 127
 
-    bool_op                        shift and go to state 123
+    bool_op                        shift and go to state 125
 
-state 99
+state 101
 
     (64) boolean_expr -> expression . compare_op expression
     (59) expression -> expression . operator expression
@@ -2384,21 +2523,21 @@ state 99
     (40) operator -> . DIVIDE
     (41) operator -> . TIMES
 
-    GREATER         shift and go to state 127
-    LESSER          shift and go to state 128
-    EQUAL           shift and go to state 129
-    NOTEQUAL        shift and go to state 130
-    GREATER_EQUAL   shift and go to state 131
-    LESSER_EQUAL    shift and go to state 132
-    PLUS            shift and go to state 62
-    MINUS           shift and go to state 63
-    DIVIDE          shift and go to state 64
-    TIMES           shift and go to state 65
+    GREATER         shift and go to state 129
+    LESSER          shift and go to state 130
+    EQUAL           shift and go to state 131
+    NOTEQUAL        shift and go to state 132
+    GREATER_EQUAL   shift and go to state 133
+    LESSER_EQUAL    shift and go to state 134
+    PLUS            shift and go to state 63
+    MINUS           shift and go to state 64
+    DIVIDE          shift and go to state 65
+    TIMES           shift and go to state 66
 
-    compare_op                     shift and go to state 126
-    operator                       shift and go to state 61
+    compare_op                     shift and go to state 128
+    operator                       shift and go to state 62
 
-state 100
+state 102
 
     (65) boolean_expr -> NOT . boolean_expr
     (64) boolean_expr -> . expression compare_op expression
@@ -2421,23 +2560,23 @@ state 100
     (12) variable -> . array
     (10) array -> . ID brackets
 
-    NOT             shift and go to state 100
-    LPAREN          shift and go to state 97
-    TRUE            shift and go to state 47
-    FALSE           shift and go to state 48
-    NUMBER          shift and go to state 43
-    STR             shift and go to state 44
+    NOT             shift and go to state 102
+    LPAREN          shift and go to state 99
+    TRUE            shift and go to state 48
+    FALSE           shift and go to state 49
+    NUMBER          shift and go to state 44
+    STR             shift and go to state 45
     ID              shift and go to state 23
 
-    boolean_expr                   shift and go to state 133
-    expression                     shift and go to state 99
-    bool_literal                   shift and go to state 101
-    literal                        shift and go to state 38
-    function_call                  shift and go to state 39
-    variable                       shift and go to state 55
-    array                          shift and go to state 46
+    boolean_expr                   shift and go to state 135
+    expression                     shift and go to state 101
+    bool_literal                   shift and go to state 103
+    literal                        shift and go to state 39
+    function_call                  shift and go to state 40
+    variable                       shift and go to state 56
+    array                          shift and go to state 47
 
-state 101
+state 103
 
     (68) boolean_expr -> bool_literal .
     (52) literal -> bool_literal .
@@ -2461,37 +2600,37 @@ state 101
   ! RPAREN          [ reduce using rule 68 (boolean_expr -> bool_literal .) ]
 
 
-state 102
+state 104
 
     (34) for_loop -> FOR LPAREN for_assign . SEMICOLON boolean_expr SEMICOLON for_iteration RPAREN LBRACE body RBRACE
 
-    SEMICOLON       shift and go to state 134
+    SEMICOLON       shift and go to state 136
 
 
-state 103
+state 105
 
     (26) for_assign -> var_assign . COMMA for_assign
     (27) for_assign -> var_assign .
 
-    COMMA           shift and go to state 135
+    COMMA           shift and go to state 137
     SEMICOLON       reduce using rule 27 (for_assign -> var_assign .)
 
 
-state 104
+state 106
 
     (28) for_assign -> empty .
 
     SEMICOLON       reduce using rule 28 (for_assign -> empty .)
 
 
-state 105
+state 107
 
     (13) var_assign -> variable . ASSIGN expression
 
-    ASSIGN          shift and go to state 76
+    ASSIGN          shift and go to state 78
 
 
-state 106
+state 108
 
     (16) if_else_statement -> if_statement else_if_statement else_statement .
 
@@ -2499,6 +2638,7 @@ state 106
     FOR             reduce using rule 16 (if_else_statement -> if_statement else_if_statement else_statement .)
     LPAREN          reduce using rule 16 (if_else_statement -> if_statement else_if_statement else_statement .)
     STD             reduce using rule 16 (if_else_statement -> if_statement else_if_statement else_statement .)
+    COMMENT         reduce using rule 16 (if_else_statement -> if_statement else_if_statement else_statement .)
     IF              reduce using rule 16 (if_else_statement -> if_statement else_if_statement else_statement .)
     NUMBER          reduce using rule 16 (if_else_statement -> if_statement else_if_statement else_statement .)
     STR             reduce using rule 16 (if_else_statement -> if_statement else_if_statement else_statement .)
@@ -2512,7 +2652,7 @@ state 106
     RBRACE          reduce using rule 16 (if_else_statement -> if_statement else_if_statement else_statement .)
 
 
-state 107
+state 109
 
     (23) else_statement -> ELSE . LBRACE body RBRACE
     (24) else_statement -> ELSE . var_assign SEMICOLON
@@ -2526,27 +2666,27 @@ state 107
     (58) type -> . BOOL
     (10) array -> . ID brackets
 
-    LBRACE          shift and go to state 109
-    ID              shift and go to state 50
+    LBRACE          shift and go to state 111
+    ID              shift and go to state 51
     INT             shift and go to state 9
     DOUBLE          shift and go to state 10
     STRING          shift and go to state 11
     BOOL            shift and go to state 12
 
-    var_assign                     shift and go to state 110
-    variable                       shift and go to state 105
+    var_assign                     shift and go to state 112
+    variable                       shift and go to state 107
     type                           shift and go to state 22
-    array                          shift and go to state 46
+    array                          shift and go to state 47
 
-state 108
+state 110
 
     (20) else_if_statement -> ELSE IF . LPAREN boolean_expr RPAREN LBRACE body RBRACE else_if_statement
     (21) else_if_statement -> ELSE IF . LPAREN boolean_expr RPAREN var_assign SEMICOLON
 
-    LPAREN          shift and go to state 136
+    LPAREN          shift and go to state 138
 
 
-state 109
+state 111
 
     (23) else_statement -> ELSE LBRACE . body RBRACE
     (75) body -> . while_loop body
@@ -2557,7 +2697,8 @@ state 109
     (80) body -> . print SEMICOLON body
     (81) body -> . increment SEMICOLON body
     (82) body -> . decrement SEMICOLON body
-    (83) body -> . empty
+    (83) body -> . comment body
+    (84) body -> . empty
     (25) while_loop -> . WHILE LPAREN boolean_expr RPAREN LBRACE body RBRACE
     (34) for_loop -> . FOR LPAREN for_assign SEMICOLON boolean_expr SEMICOLON for_iteration RPAREN LBRACE body RBRACE
     (15) if_else_statement -> . if_statement
@@ -2573,6 +2714,7 @@ state 109
     (74) print -> . STD NAMESPACE COUT DLEFT expression
     (29) increment -> . variable PLUS PLUS
     (30) decrement -> . variable MINUS MINUS
+    (35) comment -> . COMMENT
     (73) empty -> .
     (18) if_statement -> . IF LPAREN boolean_expr RPAREN LBRACE body RBRACE
     (19) if_statement -> . IF LPAREN boolean_expr RPAREN var_assign SEMICOLON
@@ -2590,23 +2732,24 @@ state 109
     (54) bool_literal -> . FALSE
     (10) array -> . ID brackets
 
-    WHILE           shift and go to state 35
-    FOR             shift and go to state 36
+    WHILE           shift and go to state 36
+    FOR             shift and go to state 37
     LPAREN          shift and go to state 24
-    STD             shift and go to state 41
+    STD             shift and go to state 42
+    COMMENT         shift and go to state 8
     RBRACE          reduce using rule 73 (empty -> .)
-    IF              shift and go to state 42
-    NUMBER          shift and go to state 43
-    STR             shift and go to state 44
+    IF              shift and go to state 43
+    NUMBER          shift and go to state 44
+    STR             shift and go to state 45
     ID              shift and go to state 23
     INT             shift and go to state 9
     DOUBLE          shift and go to state 10
     STRING          shift and go to state 11
     BOOL            shift and go to state 12
-    TRUE            shift and go to state 47
-    FALSE           shift and go to state 48
+    TRUE            shift and go to state 48
+    FALSE           shift and go to state 49
 
-    body                           shift and go to state 137
+    body                           shift and go to state 139
     while_loop                     shift and go to state 26
     for_loop                       shift and go to state 27
     if_else_statement              shift and go to state 28
@@ -2615,23 +2758,24 @@ state 109
     print                          shift and go to state 31
     increment                      shift and go to state 32
     decrement                      shift and go to state 33
-    empty                          shift and go to state 34
-    if_statement                   shift and go to state 37
-    literal                        shift and go to state 38
-    function_call                  shift and go to state 39
-    variable                       shift and go to state 40
+    comment                        shift and go to state 34
+    empty                          shift and go to state 35
+    if_statement                   shift and go to state 38
+    literal                        shift and go to state 39
+    function_call                  shift and go to state 40
+    variable                       shift and go to state 41
     type                           shift and go to state 22
-    bool_literal                   shift and go to state 45
-    array                          shift and go to state 46
+    bool_literal                   shift and go to state 46
+    array                          shift and go to state 47
 
-state 110
+state 112
 
     (24) else_statement -> ELSE var_assign . SEMICOLON
 
-    SEMICOLON       shift and go to state 138
+    SEMICOLON       shift and go to state 140
 
 
-state 111
+state 113
 
     (13) var_assign -> variable ASSIGN expression .
     (59) expression -> expression . operator expression
@@ -2642,35 +2786,36 @@ state 111
 
     SEMICOLON       reduce using rule 13 (var_assign -> variable ASSIGN expression .)
     COMMA           reduce using rule 13 (var_assign -> variable ASSIGN expression .)
-    PLUS            shift and go to state 62
-    MINUS           shift and go to state 63
-    DIVIDE          shift and go to state 64
-    TIMES           shift and go to state 65
+    RPAREN          reduce using rule 13 (var_assign -> variable ASSIGN expression .)
+    PLUS            shift and go to state 63
+    MINUS           shift and go to state 64
+    DIVIDE          shift and go to state 65
+    TIMES           shift and go to state 66
 
-    operator                       shift and go to state 61
+    operator                       shift and go to state 62
 
-state 112
+state 114
 
     (29) increment -> variable PLUS PLUS .
 
     SEMICOLON       reduce using rule 29 (increment -> variable PLUS PLUS .)
 
 
-state 113
+state 115
 
     (30) decrement -> variable MINUS MINUS .
 
     SEMICOLON       reduce using rule 30 (decrement -> variable MINUS MINUS .)
 
 
-state 114
+state 116
 
     (74) print -> STD NAMESPACE COUT . DLEFT expression
 
-    DLEFT           shift and go to state 139
+    DLEFT           shift and go to state 141
 
 
-state 115
+state 117
 
     (18) if_statement -> IF LPAREN boolean_expr . RPAREN LBRACE body RBRACE
     (19) if_statement -> IF LPAREN boolean_expr . RPAREN var_assign SEMICOLON
@@ -2678,13 +2823,13 @@ state 115
     (42) bool_op -> . AND
     (43) bool_op -> . OR
 
-    RPAREN          shift and go to state 140
-    AND             shift and go to state 124
-    OR              shift and go to state 125
+    RPAREN          shift and go to state 142
+    AND             shift and go to state 126
+    OR              shift and go to state 127
 
-    bool_op                        shift and go to state 123
+    bool_op                        shift and go to state 125
 
-state 116
+state 118
 
     (14) var_assign -> type variable ASSIGN expression .
     (59) expression -> expression . operator expression
@@ -2695,14 +2840,15 @@ state 116
 
     SEMICOLON       reduce using rule 14 (var_assign -> type variable ASSIGN expression .)
     COMMA           reduce using rule 14 (var_assign -> type variable ASSIGN expression .)
-    PLUS            shift and go to state 62
-    MINUS           shift and go to state 63
-    DIVIDE          shift and go to state 64
-    TIMES           shift and go to state 65
+    RPAREN          reduce using rule 14 (var_assign -> type variable ASSIGN expression .)
+    PLUS            shift and go to state 63
+    MINUS           shift and go to state 64
+    DIVIDE          shift and go to state 65
+    TIMES           shift and go to state 66
 
-    operator                       shift and go to state 61
+    operator                       shift and go to state 62
 
-state 117
+state 119
 
     (72) function_call -> ID LPAREN call_args RPAREN .
 
@@ -2724,7 +2870,7 @@ state 117
     OR              reduce using rule 72 (function_call -> ID LPAREN call_args RPAREN .)
 
 
-state 118
+state 120
 
     (70) call_args -> variable COMMA . call_args
     (70) call_args -> . variable COMMA call_args
@@ -2734,15 +2880,15 @@ state 118
     (73) empty -> .
     (10) array -> . ID brackets
 
-    ID              shift and go to state 50
+    ID              shift and go to state 51
     RPAREN          reduce using rule 73 (empty -> .)
 
-    variable                       shift and go to state 83
-    call_args                      shift and go to state 141
-    empty                          shift and go to state 84
-    array                          shift and go to state 46
+    variable                       shift and go to state 85
+    call_args                      shift and go to state 143
+    empty                          shift and go to state 86
+    array                          shift and go to state 47
 
-state 119
+state 121
 
     (8) brackets -> LBRACKET index RBRACKET . brackets
     (9) brackets -> LBRACKET index RBRACKET .
@@ -2766,24 +2912,24 @@ state 119
     COMMA           reduce using rule 9 (brackets -> LBRACKET index RBRACKET .)
     AND             reduce using rule 9 (brackets -> LBRACKET index RBRACKET .)
     OR              reduce using rule 9 (brackets -> LBRACKET index RBRACKET .)
-    LBRACKET        shift and go to state 53
+    LBRACKET        shift and go to state 54
 
-    brackets                       shift and go to state 142
+    brackets                       shift and go to state 144
 
-state 120
+state 122
 
     (67) boolean_expr -> LPAREN boolean_expr . RPAREN
     (66) boolean_expr -> boolean_expr . bool_op boolean_expr
     (42) bool_op -> . AND
     (43) bool_op -> . OR
 
-    RPAREN          shift and go to state 143
-    AND             shift and go to state 124
-    OR              shift and go to state 125
+    RPAREN          shift and go to state 145
+    AND             shift and go to state 126
+    OR              shift and go to state 127
 
-    bool_op                        shift and go to state 123
+    bool_op                        shift and go to state 125
 
-state 121
+state 123
 
     (60) expression -> LPAREN expression . RPAREN
     (64) boolean_expr -> expression . compare_op expression
@@ -2799,29 +2945,29 @@ state 121
     (40) operator -> . DIVIDE
     (41) operator -> . TIMES
 
-    RPAREN          shift and go to state 90
-    GREATER         shift and go to state 127
-    LESSER          shift and go to state 128
-    EQUAL           shift and go to state 129
-    NOTEQUAL        shift and go to state 130
-    GREATER_EQUAL   shift and go to state 131
-    LESSER_EQUAL    shift and go to state 132
-    PLUS            shift and go to state 62
-    MINUS           shift and go to state 63
-    DIVIDE          shift and go to state 64
-    TIMES           shift and go to state 65
+    RPAREN          shift and go to state 92
+    GREATER         shift and go to state 129
+    LESSER          shift and go to state 130
+    EQUAL           shift and go to state 131
+    NOTEQUAL        shift and go to state 132
+    GREATER_EQUAL   shift and go to state 133
+    LESSER_EQUAL    shift and go to state 134
+    PLUS            shift and go to state 63
+    MINUS           shift and go to state 64
+    DIVIDE          shift and go to state 65
+    TIMES           shift and go to state 66
 
-    compare_op                     shift and go to state 126
-    operator                       shift and go to state 61
+    compare_op                     shift and go to state 128
+    operator                       shift and go to state 62
 
-state 122
+state 124
 
     (25) while_loop -> WHILE LPAREN boolean_expr RPAREN . LBRACE body RBRACE
 
-    LBRACE          shift and go to state 144
+    LBRACE          shift and go to state 146
 
 
-state 123
+state 125
 
     (66) boolean_expr -> boolean_expr bool_op . boolean_expr
     (64) boolean_expr -> . expression compare_op expression
@@ -2844,23 +2990,23 @@ state 123
     (12) variable -> . array
     (10) array -> . ID brackets
 
-    NOT             shift and go to state 100
-    LPAREN          shift and go to state 97
-    TRUE            shift and go to state 47
-    FALSE           shift and go to state 48
-    NUMBER          shift and go to state 43
-    STR             shift and go to state 44
+    NOT             shift and go to state 102
+    LPAREN          shift and go to state 99
+    TRUE            shift and go to state 48
+    FALSE           shift and go to state 49
+    NUMBER          shift and go to state 44
+    STR             shift and go to state 45
     ID              shift and go to state 23
 
-    boolean_expr                   shift and go to state 145
-    expression                     shift and go to state 99
-    bool_literal                   shift and go to state 101
-    literal                        shift and go to state 38
-    function_call                  shift and go to state 39
-    variable                       shift and go to state 55
-    array                          shift and go to state 46
+    boolean_expr                   shift and go to state 147
+    expression                     shift and go to state 101
+    bool_literal                   shift and go to state 103
+    literal                        shift and go to state 39
+    function_call                  shift and go to state 40
+    variable                       shift and go to state 56
+    array                          shift and go to state 47
 
-state 124
+state 126
 
     (42) bool_op -> AND .
 
@@ -2873,7 +3019,7 @@ state 124
     ID              reduce using rule 42 (bool_op -> AND .)
 
 
-state 125
+state 127
 
     (43) bool_op -> OR .
 
@@ -2886,7 +3032,7 @@ state 125
     ID              reduce using rule 43 (bool_op -> OR .)
 
 
-state 126
+state 128
 
     (64) boolean_expr -> expression compare_op . expression
     (59) expression -> . expression operator expression
@@ -2905,20 +3051,20 @@ state 126
     (10) array -> . ID brackets
 
     LPAREN          shift and go to state 24
-    NUMBER          shift and go to state 43
-    STR             shift and go to state 44
+    NUMBER          shift and go to state 44
+    STR             shift and go to state 45
     ID              shift and go to state 23
-    TRUE            shift and go to state 47
-    FALSE           shift and go to state 48
+    TRUE            shift and go to state 48
+    FALSE           shift and go to state 49
 
-    expression                     shift and go to state 146
-    literal                        shift and go to state 38
-    function_call                  shift and go to state 39
-    variable                       shift and go to state 55
-    bool_literal                   shift and go to state 45
-    array                          shift and go to state 46
+    expression                     shift and go to state 148
+    literal                        shift and go to state 39
+    function_call                  shift and go to state 40
+    variable                       shift and go to state 56
+    bool_literal                   shift and go to state 46
+    array                          shift and go to state 47
 
-state 127
+state 129
 
     (44) compare_op -> GREATER .
 
@@ -2930,7 +3076,7 @@ state 127
     FALSE           reduce using rule 44 (compare_op -> GREATER .)
 
 
-state 128
+state 130
 
     (45) compare_op -> LESSER .
 
@@ -2942,7 +3088,7 @@ state 128
     FALSE           reduce using rule 45 (compare_op -> LESSER .)
 
 
-state 129
+state 131
 
     (46) compare_op -> EQUAL .
 
@@ -2954,7 +3100,7 @@ state 129
     FALSE           reduce using rule 46 (compare_op -> EQUAL .)
 
 
-state 130
+state 132
 
     (47) compare_op -> NOTEQUAL .
 
@@ -2966,7 +3112,7 @@ state 130
     FALSE           reduce using rule 47 (compare_op -> NOTEQUAL .)
 
 
-state 131
+state 133
 
     (48) compare_op -> GREATER_EQUAL .
 
@@ -2978,7 +3124,7 @@ state 131
     FALSE           reduce using rule 48 (compare_op -> GREATER_EQUAL .)
 
 
-state 132
+state 134
 
     (49) compare_op -> LESSER_EQUAL .
 
@@ -2990,7 +3136,7 @@ state 132
     FALSE           reduce using rule 49 (compare_op -> LESSER_EQUAL .)
 
 
-state 133
+state 135
 
     (65) boolean_expr -> NOT boolean_expr .
     (66) boolean_expr -> boolean_expr . bool_op boolean_expr
@@ -3001,15 +3147,15 @@ state 133
   ! shift/reduce conflict for OR resolved as shift
     RPAREN          reduce using rule 65 (boolean_expr -> NOT boolean_expr .)
     SEMICOLON       reduce using rule 65 (boolean_expr -> NOT boolean_expr .)
-    AND             shift and go to state 124
-    OR              shift and go to state 125
+    AND             shift and go to state 126
+    OR              shift and go to state 127
 
   ! AND             [ reduce using rule 65 (boolean_expr -> NOT boolean_expr .) ]
   ! OR              [ reduce using rule 65 (boolean_expr -> NOT boolean_expr .) ]
 
-    bool_op                        shift and go to state 123
+    bool_op                        shift and go to state 125
 
-state 134
+state 136
 
     (34) for_loop -> FOR LPAREN for_assign SEMICOLON . boolean_expr SEMICOLON for_iteration RPAREN LBRACE body RBRACE
     (64) boolean_expr -> . expression compare_op expression
@@ -3032,23 +3178,23 @@ state 134
     (12) variable -> . array
     (10) array -> . ID brackets
 
-    NOT             shift and go to state 100
-    LPAREN          shift and go to state 97
-    TRUE            shift and go to state 47
-    FALSE           shift and go to state 48
-    NUMBER          shift and go to state 43
-    STR             shift and go to state 44
+    NOT             shift and go to state 102
+    LPAREN          shift and go to state 99
+    TRUE            shift and go to state 48
+    FALSE           shift and go to state 49
+    NUMBER          shift and go to state 44
+    STR             shift and go to state 45
     ID              shift and go to state 23
 
-    boolean_expr                   shift and go to state 147
-    expression                     shift and go to state 99
-    bool_literal                   shift and go to state 101
-    literal                        shift and go to state 38
-    function_call                  shift and go to state 39
-    variable                       shift and go to state 55
-    array                          shift and go to state 46
+    boolean_expr                   shift and go to state 149
+    expression                     shift and go to state 101
+    bool_literal                   shift and go to state 103
+    literal                        shift and go to state 39
+    function_call                  shift and go to state 40
+    variable                       shift and go to state 56
+    array                          shift and go to state 47
 
-state 135
+state 137
 
     (26) for_assign -> var_assign COMMA . for_assign
     (26) for_assign -> . var_assign COMMA for_assign
@@ -3066,20 +3212,20 @@ state 135
     (10) array -> . ID brackets
 
     SEMICOLON       reduce using rule 73 (empty -> .)
-    ID              shift and go to state 50
+    ID              shift and go to state 51
     INT             shift and go to state 9
     DOUBLE          shift and go to state 10
     STRING          shift and go to state 11
     BOOL            shift and go to state 12
 
-    var_assign                     shift and go to state 103
-    for_assign                     shift and go to state 148
-    empty                          shift and go to state 104
-    variable                       shift and go to state 105
+    var_assign                     shift and go to state 105
+    for_assign                     shift and go to state 150
+    empty                          shift and go to state 106
+    variable                       shift and go to state 107
     type                           shift and go to state 22
-    array                          shift and go to state 46
+    array                          shift and go to state 47
 
-state 136
+state 138
 
     (20) else_if_statement -> ELSE IF LPAREN . boolean_expr RPAREN LBRACE body RBRACE else_if_statement
     (21) else_if_statement -> ELSE IF LPAREN . boolean_expr RPAREN var_assign SEMICOLON
@@ -3103,30 +3249,30 @@ state 136
     (12) variable -> . array
     (10) array -> . ID brackets
 
-    NOT             shift and go to state 100
-    LPAREN          shift and go to state 97
-    TRUE            shift and go to state 47
-    FALSE           shift and go to state 48
-    NUMBER          shift and go to state 43
-    STR             shift and go to state 44
+    NOT             shift and go to state 102
+    LPAREN          shift and go to state 99
+    TRUE            shift and go to state 48
+    FALSE           shift and go to state 49
+    NUMBER          shift and go to state 44
+    STR             shift and go to state 45
     ID              shift and go to state 23
 
-    boolean_expr                   shift and go to state 149
-    expression                     shift and go to state 99
-    bool_literal                   shift and go to state 101
-    literal                        shift and go to state 38
-    function_call                  shift and go to state 39
-    variable                       shift and go to state 55
-    array                          shift and go to state 46
+    boolean_expr                   shift and go to state 151
+    expression                     shift and go to state 101
+    bool_literal                   shift and go to state 103
+    literal                        shift and go to state 39
+    function_call                  shift and go to state 40
+    variable                       shift and go to state 56
+    array                          shift and go to state 47
 
-state 137
+state 139
 
     (23) else_statement -> ELSE LBRACE body . RBRACE
 
-    RBRACE          shift and go to state 150
+    RBRACE          shift and go to state 152
 
 
-state 138
+state 140
 
     (24) else_statement -> ELSE var_assign SEMICOLON .
 
@@ -3134,6 +3280,7 @@ state 138
     FOR             reduce using rule 24 (else_statement -> ELSE var_assign SEMICOLON .)
     LPAREN          reduce using rule 24 (else_statement -> ELSE var_assign SEMICOLON .)
     STD             reduce using rule 24 (else_statement -> ELSE var_assign SEMICOLON .)
+    COMMENT         reduce using rule 24 (else_statement -> ELSE var_assign SEMICOLON .)
     IF              reduce using rule 24 (else_statement -> ELSE var_assign SEMICOLON .)
     NUMBER          reduce using rule 24 (else_statement -> ELSE var_assign SEMICOLON .)
     STR             reduce using rule 24 (else_statement -> ELSE var_assign SEMICOLON .)
@@ -3147,7 +3294,7 @@ state 138
     RBRACE          reduce using rule 24 (else_statement -> ELSE var_assign SEMICOLON .)
 
 
-state 139
+state 141
 
     (74) print -> STD NAMESPACE COUT DLEFT . expression
     (59) expression -> . expression operator expression
@@ -3166,20 +3313,20 @@ state 139
     (10) array -> . ID brackets
 
     LPAREN          shift and go to state 24
-    NUMBER          shift and go to state 43
-    STR             shift and go to state 44
+    NUMBER          shift and go to state 44
+    STR             shift and go to state 45
     ID              shift and go to state 23
-    TRUE            shift and go to state 47
-    FALSE           shift and go to state 48
+    TRUE            shift and go to state 48
+    FALSE           shift and go to state 49
 
-    expression                     shift and go to state 151
-    literal                        shift and go to state 38
-    function_call                  shift and go to state 39
-    variable                       shift and go to state 55
-    bool_literal                   shift and go to state 45
-    array                          shift and go to state 46
+    expression                     shift and go to state 153
+    literal                        shift and go to state 39
+    function_call                  shift and go to state 40
+    variable                       shift and go to state 56
+    bool_literal                   shift and go to state 46
+    array                          shift and go to state 47
 
-state 140
+state 142
 
     (18) if_statement -> IF LPAREN boolean_expr RPAREN . LBRACE body RBRACE
     (19) if_statement -> IF LPAREN boolean_expr RPAREN . var_assign SEMICOLON
@@ -3193,26 +3340,26 @@ state 140
     (58) type -> . BOOL
     (10) array -> . ID brackets
 
-    LBRACE          shift and go to state 152
-    ID              shift and go to state 50
+    LBRACE          shift and go to state 154
+    ID              shift and go to state 51
     INT             shift and go to state 9
     DOUBLE          shift and go to state 10
     STRING          shift and go to state 11
     BOOL            shift and go to state 12
 
-    var_assign                     shift and go to state 153
-    variable                       shift and go to state 105
+    var_assign                     shift and go to state 155
+    variable                       shift and go to state 107
     type                           shift and go to state 22
-    array                          shift and go to state 46
+    array                          shift and go to state 47
 
-state 141
+state 143
 
     (70) call_args -> variable COMMA call_args .
 
     RPAREN          reduce using rule 70 (call_args -> variable COMMA call_args .)
 
 
-state 142
+state 144
 
     (8) brackets -> LBRACKET index RBRACKET brackets .
 
@@ -3235,7 +3382,7 @@ state 142
     OR              reduce using rule 8 (brackets -> LBRACKET index RBRACKET brackets .)
 
 
-state 143
+state 145
 
     (67) boolean_expr -> LPAREN boolean_expr RPAREN .
 
@@ -3245,7 +3392,7 @@ state 143
     SEMICOLON       reduce using rule 67 (boolean_expr -> LPAREN boolean_expr RPAREN .)
 
 
-state 144
+state 146
 
     (25) while_loop -> WHILE LPAREN boolean_expr RPAREN LBRACE . body RBRACE
     (75) body -> . while_loop body
@@ -3256,7 +3403,8 @@ state 144
     (80) body -> . print SEMICOLON body
     (81) body -> . increment SEMICOLON body
     (82) body -> . decrement SEMICOLON body
-    (83) body -> . empty
+    (83) body -> . comment body
+    (84) body -> . empty
     (25) while_loop -> . WHILE LPAREN boolean_expr RPAREN LBRACE body RBRACE
     (34) for_loop -> . FOR LPAREN for_assign SEMICOLON boolean_expr SEMICOLON for_iteration RPAREN LBRACE body RBRACE
     (15) if_else_statement -> . if_statement
@@ -3272,6 +3420,7 @@ state 144
     (74) print -> . STD NAMESPACE COUT DLEFT expression
     (29) increment -> . variable PLUS PLUS
     (30) decrement -> . variable MINUS MINUS
+    (35) comment -> . COMMENT
     (73) empty -> .
     (18) if_statement -> . IF LPAREN boolean_expr RPAREN LBRACE body RBRACE
     (19) if_statement -> . IF LPAREN boolean_expr RPAREN var_assign SEMICOLON
@@ -3289,23 +3438,24 @@ state 144
     (54) bool_literal -> . FALSE
     (10) array -> . ID brackets
 
-    WHILE           shift and go to state 35
-    FOR             shift and go to state 36
+    WHILE           shift and go to state 36
+    FOR             shift and go to state 37
     LPAREN          shift and go to state 24
-    STD             shift and go to state 41
+    STD             shift and go to state 42
+    COMMENT         shift and go to state 8
     RBRACE          reduce using rule 73 (empty -> .)
-    IF              shift and go to state 42
-    NUMBER          shift and go to state 43
-    STR             shift and go to state 44
+    IF              shift and go to state 43
+    NUMBER          shift and go to state 44
+    STR             shift and go to state 45
     ID              shift and go to state 23
     INT             shift and go to state 9
     DOUBLE          shift and go to state 10
     STRING          shift and go to state 11
     BOOL            shift and go to state 12
-    TRUE            shift and go to state 47
-    FALSE           shift and go to state 48
+    TRUE            shift and go to state 48
+    FALSE           shift and go to state 49
 
-    body                           shift and go to state 154
+    body                           shift and go to state 156
     while_loop                     shift and go to state 26
     for_loop                       shift and go to state 27
     if_else_statement              shift and go to state 28
@@ -3314,16 +3464,17 @@ state 144
     print                          shift and go to state 31
     increment                      shift and go to state 32
     decrement                      shift and go to state 33
-    empty                          shift and go to state 34
-    if_statement                   shift and go to state 37
-    literal                        shift and go to state 38
-    function_call                  shift and go to state 39
-    variable                       shift and go to state 40
+    comment                        shift and go to state 34
+    empty                          shift and go to state 35
+    if_statement                   shift and go to state 38
+    literal                        shift and go to state 39
+    function_call                  shift and go to state 40
+    variable                       shift and go to state 41
     type                           shift and go to state 22
-    bool_literal                   shift and go to state 45
-    array                          shift and go to state 46
+    bool_literal                   shift and go to state 46
+    array                          shift and go to state 47
 
-state 145
+state 147
 
     (66) boolean_expr -> boolean_expr bool_op boolean_expr .
     (66) boolean_expr -> boolean_expr . bool_op boolean_expr
@@ -3334,15 +3485,15 @@ state 145
   ! shift/reduce conflict for OR resolved as shift
     RPAREN          reduce using rule 66 (boolean_expr -> boolean_expr bool_op boolean_expr .)
     SEMICOLON       reduce using rule 66 (boolean_expr -> boolean_expr bool_op boolean_expr .)
-    AND             shift and go to state 124
-    OR              shift and go to state 125
+    AND             shift and go to state 126
+    OR              shift and go to state 127
 
   ! AND             [ reduce using rule 66 (boolean_expr -> boolean_expr bool_op boolean_expr .) ]
   ! OR              [ reduce using rule 66 (boolean_expr -> boolean_expr bool_op boolean_expr .) ]
 
-    bool_op                        shift and go to state 123
+    bool_op                        shift and go to state 125
 
-state 146
+state 148
 
     (64) boolean_expr -> expression compare_op expression .
     (59) expression -> expression . operator expression
@@ -3355,34 +3506,34 @@ state 146
     AND             reduce using rule 64 (boolean_expr -> expression compare_op expression .)
     OR              reduce using rule 64 (boolean_expr -> expression compare_op expression .)
     SEMICOLON       reduce using rule 64 (boolean_expr -> expression compare_op expression .)
-    PLUS            shift and go to state 62
-    MINUS           shift and go to state 63
-    DIVIDE          shift and go to state 64
-    TIMES           shift and go to state 65
+    PLUS            shift and go to state 63
+    MINUS           shift and go to state 64
+    DIVIDE          shift and go to state 65
+    TIMES           shift and go to state 66
 
-    operator                       shift and go to state 61
+    operator                       shift and go to state 62
 
-state 147
+state 149
 
     (34) for_loop -> FOR LPAREN for_assign SEMICOLON boolean_expr . SEMICOLON for_iteration RPAREN LBRACE body RBRACE
     (66) boolean_expr -> boolean_expr . bool_op boolean_expr
     (42) bool_op -> . AND
     (43) bool_op -> . OR
 
-    SEMICOLON       shift and go to state 155
-    AND             shift and go to state 124
-    OR              shift and go to state 125
+    SEMICOLON       shift and go to state 157
+    AND             shift and go to state 126
+    OR              shift and go to state 127
 
-    bool_op                        shift and go to state 123
+    bool_op                        shift and go to state 125
 
-state 148
+state 150
 
     (26) for_assign -> var_assign COMMA for_assign .
 
     SEMICOLON       reduce using rule 26 (for_assign -> var_assign COMMA for_assign .)
 
 
-state 149
+state 151
 
     (20) else_if_statement -> ELSE IF LPAREN boolean_expr . RPAREN LBRACE body RBRACE else_if_statement
     (21) else_if_statement -> ELSE IF LPAREN boolean_expr . RPAREN var_assign SEMICOLON
@@ -3390,13 +3541,13 @@ state 149
     (42) bool_op -> . AND
     (43) bool_op -> . OR
 
-    RPAREN          shift and go to state 156
-    AND             shift and go to state 124
-    OR              shift and go to state 125
+    RPAREN          shift and go to state 158
+    AND             shift and go to state 126
+    OR              shift and go to state 127
 
-    bool_op                        shift and go to state 123
+    bool_op                        shift and go to state 125
 
-state 150
+state 152
 
     (23) else_statement -> ELSE LBRACE body RBRACE .
 
@@ -3404,6 +3555,7 @@ state 150
     FOR             reduce using rule 23 (else_statement -> ELSE LBRACE body RBRACE .)
     LPAREN          reduce using rule 23 (else_statement -> ELSE LBRACE body RBRACE .)
     STD             reduce using rule 23 (else_statement -> ELSE LBRACE body RBRACE .)
+    COMMENT         reduce using rule 23 (else_statement -> ELSE LBRACE body RBRACE .)
     IF              reduce using rule 23 (else_statement -> ELSE LBRACE body RBRACE .)
     NUMBER          reduce using rule 23 (else_statement -> ELSE LBRACE body RBRACE .)
     STR             reduce using rule 23 (else_statement -> ELSE LBRACE body RBRACE .)
@@ -3417,7 +3569,7 @@ state 150
     RBRACE          reduce using rule 23 (else_statement -> ELSE LBRACE body RBRACE .)
 
 
-state 151
+state 153
 
     (74) print -> STD NAMESPACE COUT DLEFT expression .
     (59) expression -> expression . operator expression
@@ -3427,14 +3579,14 @@ state 151
     (41) operator -> . TIMES
 
     SEMICOLON       reduce using rule 74 (print -> STD NAMESPACE COUT DLEFT expression .)
-    PLUS            shift and go to state 62
-    MINUS           shift and go to state 63
-    DIVIDE          shift and go to state 64
-    TIMES           shift and go to state 65
+    PLUS            shift and go to state 63
+    MINUS           shift and go to state 64
+    DIVIDE          shift and go to state 65
+    TIMES           shift and go to state 66
 
-    operator                       shift and go to state 61
+    operator                       shift and go to state 62
 
-state 152
+state 154
 
     (18) if_statement -> IF LPAREN boolean_expr RPAREN LBRACE . body RBRACE
     (75) body -> . while_loop body
@@ -3445,7 +3597,8 @@ state 152
     (80) body -> . print SEMICOLON body
     (81) body -> . increment SEMICOLON body
     (82) body -> . decrement SEMICOLON body
-    (83) body -> . empty
+    (83) body -> . comment body
+    (84) body -> . empty
     (25) while_loop -> . WHILE LPAREN boolean_expr RPAREN LBRACE body RBRACE
     (34) for_loop -> . FOR LPAREN for_assign SEMICOLON boolean_expr SEMICOLON for_iteration RPAREN LBRACE body RBRACE
     (15) if_else_statement -> . if_statement
@@ -3461,6 +3614,7 @@ state 152
     (74) print -> . STD NAMESPACE COUT DLEFT expression
     (29) increment -> . variable PLUS PLUS
     (30) decrement -> . variable MINUS MINUS
+    (35) comment -> . COMMENT
     (73) empty -> .
     (18) if_statement -> . IF LPAREN boolean_expr RPAREN LBRACE body RBRACE
     (19) if_statement -> . IF LPAREN boolean_expr RPAREN var_assign SEMICOLON
@@ -3478,23 +3632,24 @@ state 152
     (54) bool_literal -> . FALSE
     (10) array -> . ID brackets
 
-    WHILE           shift and go to state 35
-    FOR             shift and go to state 36
+    WHILE           shift and go to state 36
+    FOR             shift and go to state 37
     LPAREN          shift and go to state 24
-    STD             shift and go to state 41
+    STD             shift and go to state 42
+    COMMENT         shift and go to state 8
     RBRACE          reduce using rule 73 (empty -> .)
-    IF              shift and go to state 42
-    NUMBER          shift and go to state 43
-    STR             shift and go to state 44
+    IF              shift and go to state 43
+    NUMBER          shift and go to state 44
+    STR             shift and go to state 45
     ID              shift and go to state 23
     INT             shift and go to state 9
     DOUBLE          shift and go to state 10
     STRING          shift and go to state 11
     BOOL            shift and go to state 12
-    TRUE            shift and go to state 47
-    FALSE           shift and go to state 48
+    TRUE            shift and go to state 48
+    FALSE           shift and go to state 49
 
-    body                           shift and go to state 157
+    body                           shift and go to state 159
     while_loop                     shift and go to state 26
     for_loop                       shift and go to state 27
     if_else_statement              shift and go to state 28
@@ -3503,69 +3658,62 @@ state 152
     print                          shift and go to state 31
     increment                      shift and go to state 32
     decrement                      shift and go to state 33
-    empty                          shift and go to state 34
-    if_statement                   shift and go to state 37
-    literal                        shift and go to state 38
-    function_call                  shift and go to state 39
-    variable                       shift and go to state 40
+    comment                        shift and go to state 34
+    empty                          shift and go to state 35
+    if_statement                   shift and go to state 38
+    literal                        shift and go to state 39
+    function_call                  shift and go to state 40
+    variable                       shift and go to state 41
     type                           shift and go to state 22
-    bool_literal                   shift and go to state 45
-    array                          shift and go to state 46
-
-state 153
-
-    (19) if_statement -> IF LPAREN boolean_expr RPAREN var_assign . SEMICOLON
-
-    SEMICOLON       shift and go to state 158
-
-
-state 154
-
-    (25) while_loop -> WHILE LPAREN boolean_expr RPAREN LBRACE body . RBRACE
-
-    RBRACE          shift and go to state 159
-
+    bool_literal                   shift and go to state 46
+    array                          shift and go to state 47
 
 state 155
 
-    (34) for_loop -> FOR LPAREN for_assign SEMICOLON boolean_expr SEMICOLON . for_iteration RPAREN LBRACE body RBRACE
-    (31) for_iteration -> . expression COMMA for_iteration
-    (32) for_iteration -> . expression
-    (33) for_iteration -> . empty
-    (59) expression -> . expression operator expression
-    (60) expression -> . LPAREN expression RPAREN
-    (61) expression -> . literal
-    (62) expression -> . function_call
-    (63) expression -> . variable
-    (73) empty -> .
-    (50) literal -> . NUMBER
-    (51) literal -> . STR
-    (52) literal -> . bool_literal
-    (72) function_call -> . ID LPAREN call_args RPAREN
-    (11) variable -> . ID
-    (12) variable -> . array
-    (53) bool_literal -> . TRUE
-    (54) bool_literal -> . FALSE
-    (10) array -> . ID brackets
+    (19) if_statement -> IF LPAREN boolean_expr RPAREN var_assign . SEMICOLON
 
-    LPAREN          shift and go to state 24
-    RPAREN          reduce using rule 73 (empty -> .)
-    NUMBER          shift and go to state 43
-    STR             shift and go to state 44
-    ID              shift and go to state 23
-    TRUE            shift and go to state 47
-    FALSE           shift and go to state 48
+    SEMICOLON       shift and go to state 160
 
-    for_iteration                  shift and go to state 160
-    expression                     shift and go to state 161
-    empty                          shift and go to state 162
-    literal                        shift and go to state 38
-    function_call                  shift and go to state 39
-    variable                       shift and go to state 55
-    bool_literal                   shift and go to state 45
-    array                          shift and go to state 46
 
 state 156
+
+    (25) while_loop -> WHILE LPAREN boolean_expr RPAREN LBRACE body . RBRACE
+
+    RBRACE          shift and go to state 161
+
+
+state 157
+
+    (34) for_loop -> FOR LPAREN for_assign SEMICOLON boolean_expr SEMICOLON . for_iteration RPAREN LBRACE body RBRACE
+    (31) for_iteration -> . var_assign COMMA for_iteration
+    (32) for_iteration -> . var_assign
+    (33) for_iteration -> . empty
+    (13) var_assign -> . variable ASSIGN expression
+    (14) var_assign -> . type variable ASSIGN expression
+    (73) empty -> .
+    (11) variable -> . ID
+    (12) variable -> . array
+    (55) type -> . INT
+    (56) type -> . DOUBLE
+    (57) type -> . STRING
+    (58) type -> . BOOL
+    (10) array -> . ID brackets
+
+    RPAREN          reduce using rule 73 (empty -> .)
+    ID              shift and go to state 51
+    INT             shift and go to state 9
+    DOUBLE          shift and go to state 10
+    STRING          shift and go to state 11
+    BOOL            shift and go to state 12
+
+    for_iteration                  shift and go to state 162
+    var_assign                     shift and go to state 163
+    empty                          shift and go to state 164
+    variable                       shift and go to state 107
+    type                           shift and go to state 22
+    array                          shift and go to state 47
+
+state 158
 
     (20) else_if_statement -> ELSE IF LPAREN boolean_expr RPAREN . LBRACE body RBRACE else_if_statement
     (21) else_if_statement -> ELSE IF LPAREN boolean_expr RPAREN . var_assign SEMICOLON
@@ -3579,26 +3727,26 @@ state 156
     (58) type -> . BOOL
     (10) array -> . ID brackets
 
-    LBRACE          shift and go to state 163
-    ID              shift and go to state 50
+    LBRACE          shift and go to state 165
+    ID              shift and go to state 51
     INT             shift and go to state 9
     DOUBLE          shift and go to state 10
     STRING          shift and go to state 11
     BOOL            shift and go to state 12
 
-    var_assign                     shift and go to state 164
-    variable                       shift and go to state 105
+    var_assign                     shift and go to state 166
+    variable                       shift and go to state 107
     type                           shift and go to state 22
-    array                          shift and go to state 46
+    array                          shift and go to state 47
 
-state 157
+state 159
 
     (18) if_statement -> IF LPAREN boolean_expr RPAREN LBRACE body . RBRACE
 
-    RBRACE          shift and go to state 165
+    RBRACE          shift and go to state 167
 
 
-state 158
+state 160
 
     (19) if_statement -> IF LPAREN boolean_expr RPAREN var_assign SEMICOLON .
 
@@ -3607,6 +3755,7 @@ state 158
     FOR             reduce using rule 19 (if_statement -> IF LPAREN boolean_expr RPAREN var_assign SEMICOLON .)
     LPAREN          reduce using rule 19 (if_statement -> IF LPAREN boolean_expr RPAREN var_assign SEMICOLON .)
     STD             reduce using rule 19 (if_statement -> IF LPAREN boolean_expr RPAREN var_assign SEMICOLON .)
+    COMMENT         reduce using rule 19 (if_statement -> IF LPAREN boolean_expr RPAREN var_assign SEMICOLON .)
     IF              reduce using rule 19 (if_statement -> IF LPAREN boolean_expr RPAREN var_assign SEMICOLON .)
     NUMBER          reduce using rule 19 (if_statement -> IF LPAREN boolean_expr RPAREN var_assign SEMICOLON .)
     STR             reduce using rule 19 (if_statement -> IF LPAREN boolean_expr RPAREN var_assign SEMICOLON .)
@@ -3620,7 +3769,7 @@ state 158
     RBRACE          reduce using rule 19 (if_statement -> IF LPAREN boolean_expr RPAREN var_assign SEMICOLON .)
 
 
-state 159
+state 161
 
     (25) while_loop -> WHILE LPAREN boolean_expr RPAREN LBRACE body RBRACE .
 
@@ -3628,6 +3777,7 @@ state 159
     FOR             reduce using rule 25 (while_loop -> WHILE LPAREN boolean_expr RPAREN LBRACE body RBRACE .)
     LPAREN          reduce using rule 25 (while_loop -> WHILE LPAREN boolean_expr RPAREN LBRACE body RBRACE .)
     STD             reduce using rule 25 (while_loop -> WHILE LPAREN boolean_expr RPAREN LBRACE body RBRACE .)
+    COMMENT         reduce using rule 25 (while_loop -> WHILE LPAREN boolean_expr RPAREN LBRACE body RBRACE .)
     IF              reduce using rule 25 (while_loop -> WHILE LPAREN boolean_expr RPAREN LBRACE body RBRACE .)
     NUMBER          reduce using rule 25 (while_loop -> WHILE LPAREN boolean_expr RPAREN LBRACE body RBRACE .)
     STR             reduce using rule 25 (while_loop -> WHILE LPAREN boolean_expr RPAREN LBRACE body RBRACE .)
@@ -3641,40 +3791,30 @@ state 159
     RBRACE          reduce using rule 25 (while_loop -> WHILE LPAREN boolean_expr RPAREN LBRACE body RBRACE .)
 
 
-state 160
+state 162
 
     (34) for_loop -> FOR LPAREN for_assign SEMICOLON boolean_expr SEMICOLON for_iteration . RPAREN LBRACE body RBRACE
 
-    RPAREN          shift and go to state 166
+    RPAREN          shift and go to state 168
 
 
-state 161
+state 163
 
-    (31) for_iteration -> expression . COMMA for_iteration
-    (32) for_iteration -> expression .
-    (59) expression -> expression . operator expression
-    (38) operator -> . PLUS
-    (39) operator -> . MINUS
-    (40) operator -> . DIVIDE
-    (41) operator -> . TIMES
+    (31) for_iteration -> var_assign . COMMA for_iteration
+    (32) for_iteration -> var_assign .
 
-    COMMA           shift and go to state 167
-    RPAREN          reduce using rule 32 (for_iteration -> expression .)
-    PLUS            shift and go to state 62
-    MINUS           shift and go to state 63
-    DIVIDE          shift and go to state 64
-    TIMES           shift and go to state 65
+    COMMA           shift and go to state 169
+    RPAREN          reduce using rule 32 (for_iteration -> var_assign .)
 
-    operator                       shift and go to state 61
 
-state 162
+state 164
 
     (33) for_iteration -> empty .
 
     RPAREN          reduce using rule 33 (for_iteration -> empty .)
 
 
-state 163
+state 165
 
     (20) else_if_statement -> ELSE IF LPAREN boolean_expr RPAREN LBRACE . body RBRACE else_if_statement
     (75) body -> . while_loop body
@@ -3685,7 +3825,8 @@ state 163
     (80) body -> . print SEMICOLON body
     (81) body -> . increment SEMICOLON body
     (82) body -> . decrement SEMICOLON body
-    (83) body -> . empty
+    (83) body -> . comment body
+    (84) body -> . empty
     (25) while_loop -> . WHILE LPAREN boolean_expr RPAREN LBRACE body RBRACE
     (34) for_loop -> . FOR LPAREN for_assign SEMICOLON boolean_expr SEMICOLON for_iteration RPAREN LBRACE body RBRACE
     (15) if_else_statement -> . if_statement
@@ -3701,6 +3842,7 @@ state 163
     (74) print -> . STD NAMESPACE COUT DLEFT expression
     (29) increment -> . variable PLUS PLUS
     (30) decrement -> . variable MINUS MINUS
+    (35) comment -> . COMMENT
     (73) empty -> .
     (18) if_statement -> . IF LPAREN boolean_expr RPAREN LBRACE body RBRACE
     (19) if_statement -> . IF LPAREN boolean_expr RPAREN var_assign SEMICOLON
@@ -3718,23 +3860,24 @@ state 163
     (54) bool_literal -> . FALSE
     (10) array -> . ID brackets
 
-    WHILE           shift and go to state 35
-    FOR             shift and go to state 36
+    WHILE           shift and go to state 36
+    FOR             shift and go to state 37
     LPAREN          shift and go to state 24
-    STD             shift and go to state 41
+    STD             shift and go to state 42
+    COMMENT         shift and go to state 8
     RBRACE          reduce using rule 73 (empty -> .)
-    IF              shift and go to state 42
-    NUMBER          shift and go to state 43
-    STR             shift and go to state 44
+    IF              shift and go to state 43
+    NUMBER          shift and go to state 44
+    STR             shift and go to state 45
     ID              shift and go to state 23
     INT             shift and go to state 9
     DOUBLE          shift and go to state 10
     STRING          shift and go to state 11
     BOOL            shift and go to state 12
-    TRUE            shift and go to state 47
-    FALSE           shift and go to state 48
+    TRUE            shift and go to state 48
+    FALSE           shift and go to state 49
 
-    body                           shift and go to state 168
+    body                           shift and go to state 170
     while_loop                     shift and go to state 26
     for_loop                       shift and go to state 27
     if_else_statement              shift and go to state 28
@@ -3743,23 +3886,24 @@ state 163
     print                          shift and go to state 31
     increment                      shift and go to state 32
     decrement                      shift and go to state 33
-    empty                          shift and go to state 34
-    if_statement                   shift and go to state 37
-    literal                        shift and go to state 38
-    function_call                  shift and go to state 39
-    variable                       shift and go to state 40
+    comment                        shift and go to state 34
+    empty                          shift and go to state 35
+    if_statement                   shift and go to state 38
+    literal                        shift and go to state 39
+    function_call                  shift and go to state 40
+    variable                       shift and go to state 41
     type                           shift and go to state 22
-    bool_literal                   shift and go to state 45
-    array                          shift and go to state 46
+    bool_literal                   shift and go to state 46
+    array                          shift and go to state 47
 
-state 164
+state 166
 
     (21) else_if_statement -> ELSE IF LPAREN boolean_expr RPAREN var_assign . SEMICOLON
 
-    SEMICOLON       shift and go to state 169
+    SEMICOLON       shift and go to state 171
 
 
-state 165
+state 167
 
     (18) if_statement -> IF LPAREN boolean_expr RPAREN LBRACE body RBRACE .
 
@@ -3768,6 +3912,7 @@ state 165
     FOR             reduce using rule 18 (if_statement -> IF LPAREN boolean_expr RPAREN LBRACE body RBRACE .)
     LPAREN          reduce using rule 18 (if_statement -> IF LPAREN boolean_expr RPAREN LBRACE body RBRACE .)
     STD             reduce using rule 18 (if_statement -> IF LPAREN boolean_expr RPAREN LBRACE body RBRACE .)
+    COMMENT         reduce using rule 18 (if_statement -> IF LPAREN boolean_expr RPAREN LBRACE body RBRACE .)
     IF              reduce using rule 18 (if_statement -> IF LPAREN boolean_expr RPAREN LBRACE body RBRACE .)
     NUMBER          reduce using rule 18 (if_statement -> IF LPAREN boolean_expr RPAREN LBRACE body RBRACE .)
     STR             reduce using rule 18 (if_statement -> IF LPAREN boolean_expr RPAREN LBRACE body RBRACE .)
@@ -3781,67 +3926,59 @@ state 165
     RBRACE          reduce using rule 18 (if_statement -> IF LPAREN boolean_expr RPAREN LBRACE body RBRACE .)
 
 
-state 166
+state 168
 
     (34) for_loop -> FOR LPAREN for_assign SEMICOLON boolean_expr SEMICOLON for_iteration RPAREN . LBRACE body RBRACE
 
-    LBRACE          shift and go to state 170
-
-
-state 167
-
-    (31) for_iteration -> expression COMMA . for_iteration
-    (31) for_iteration -> . expression COMMA for_iteration
-    (32) for_iteration -> . expression
-    (33) for_iteration -> . empty
-    (59) expression -> . expression operator expression
-    (60) expression -> . LPAREN expression RPAREN
-    (61) expression -> . literal
-    (62) expression -> . function_call
-    (63) expression -> . variable
-    (73) empty -> .
-    (50) literal -> . NUMBER
-    (51) literal -> . STR
-    (52) literal -> . bool_literal
-    (72) function_call -> . ID LPAREN call_args RPAREN
-    (11) variable -> . ID
-    (12) variable -> . array
-    (53) bool_literal -> . TRUE
-    (54) bool_literal -> . FALSE
-    (10) array -> . ID brackets
-
-    LPAREN          shift and go to state 24
-    RPAREN          reduce using rule 73 (empty -> .)
-    NUMBER          shift and go to state 43
-    STR             shift and go to state 44
-    ID              shift and go to state 23
-    TRUE            shift and go to state 47
-    FALSE           shift and go to state 48
-
-    expression                     shift and go to state 161
-    for_iteration                  shift and go to state 171
-    empty                          shift and go to state 162
-    literal                        shift and go to state 38
-    function_call                  shift and go to state 39
-    variable                       shift and go to state 55
-    bool_literal                   shift and go to state 45
-    array                          shift and go to state 46
-
-state 168
-
-    (20) else_if_statement -> ELSE IF LPAREN boolean_expr RPAREN LBRACE body . RBRACE else_if_statement
-
-    RBRACE          shift and go to state 172
+    LBRACE          shift and go to state 172
 
 
 state 169
+
+    (31) for_iteration -> var_assign COMMA . for_iteration
+    (31) for_iteration -> . var_assign COMMA for_iteration
+    (32) for_iteration -> . var_assign
+    (33) for_iteration -> . empty
+    (13) var_assign -> . variable ASSIGN expression
+    (14) var_assign -> . type variable ASSIGN expression
+    (73) empty -> .
+    (11) variable -> . ID
+    (12) variable -> . array
+    (55) type -> . INT
+    (56) type -> . DOUBLE
+    (57) type -> . STRING
+    (58) type -> . BOOL
+    (10) array -> . ID brackets
+
+    RPAREN          reduce using rule 73 (empty -> .)
+    ID              shift and go to state 51
+    INT             shift and go to state 9
+    DOUBLE          shift and go to state 10
+    STRING          shift and go to state 11
+    BOOL            shift and go to state 12
+
+    var_assign                     shift and go to state 163
+    for_iteration                  shift and go to state 173
+    empty                          shift and go to state 164
+    variable                       shift and go to state 107
+    type                           shift and go to state 22
+    array                          shift and go to state 47
+
+state 170
+
+    (20) else_if_statement -> ELSE IF LPAREN boolean_expr RPAREN LBRACE body . RBRACE else_if_statement
+
+    RBRACE          shift and go to state 174
+
+
+state 171
 
     (21) else_if_statement -> ELSE IF LPAREN boolean_expr RPAREN var_assign SEMICOLON .
 
     ELSE            reduce using rule 21 (else_if_statement -> ELSE IF LPAREN boolean_expr RPAREN var_assign SEMICOLON .)
 
 
-state 170
+state 172
 
     (34) for_loop -> FOR LPAREN for_assign SEMICOLON boolean_expr SEMICOLON for_iteration RPAREN LBRACE . body RBRACE
     (75) body -> . while_loop body
@@ -3852,7 +3989,8 @@ state 170
     (80) body -> . print SEMICOLON body
     (81) body -> . increment SEMICOLON body
     (82) body -> . decrement SEMICOLON body
-    (83) body -> . empty
+    (83) body -> . comment body
+    (84) body -> . empty
     (25) while_loop -> . WHILE LPAREN boolean_expr RPAREN LBRACE body RBRACE
     (34) for_loop -> . FOR LPAREN for_assign SEMICOLON boolean_expr SEMICOLON for_iteration RPAREN LBRACE body RBRACE
     (15) if_else_statement -> . if_statement
@@ -3868,6 +4006,7 @@ state 170
     (74) print -> . STD NAMESPACE COUT DLEFT expression
     (29) increment -> . variable PLUS PLUS
     (30) decrement -> . variable MINUS MINUS
+    (35) comment -> . COMMENT
     (73) empty -> .
     (18) if_statement -> . IF LPAREN boolean_expr RPAREN LBRACE body RBRACE
     (19) if_statement -> . IF LPAREN boolean_expr RPAREN var_assign SEMICOLON
@@ -3885,23 +4024,24 @@ state 170
     (54) bool_literal -> . FALSE
     (10) array -> . ID brackets
 
-    WHILE           shift and go to state 35
-    FOR             shift and go to state 36
+    WHILE           shift and go to state 36
+    FOR             shift and go to state 37
     LPAREN          shift and go to state 24
-    STD             shift and go to state 41
+    STD             shift and go to state 42
+    COMMENT         shift and go to state 8
     RBRACE          reduce using rule 73 (empty -> .)
-    IF              shift and go to state 42
-    NUMBER          shift and go to state 43
-    STR             shift and go to state 44
+    IF              shift and go to state 43
+    NUMBER          shift and go to state 44
+    STR             shift and go to state 45
     ID              shift and go to state 23
     INT             shift and go to state 9
     DOUBLE          shift and go to state 10
     STRING          shift and go to state 11
     BOOL            shift and go to state 12
-    TRUE            shift and go to state 47
-    FALSE           shift and go to state 48
+    TRUE            shift and go to state 48
+    FALSE           shift and go to state 49
 
-    body                           shift and go to state 173
+    body                           shift and go to state 175
     while_loop                     shift and go to state 26
     for_loop                       shift and go to state 27
     if_else_statement              shift and go to state 28
@@ -3910,23 +4050,24 @@ state 170
     print                          shift and go to state 31
     increment                      shift and go to state 32
     decrement                      shift and go to state 33
-    empty                          shift and go to state 34
-    if_statement                   shift and go to state 37
-    literal                        shift and go to state 38
-    function_call                  shift and go to state 39
-    variable                       shift and go to state 40
+    comment                        shift and go to state 34
+    empty                          shift and go to state 35
+    if_statement                   shift and go to state 38
+    literal                        shift and go to state 39
+    function_call                  shift and go to state 40
+    variable                       shift and go to state 41
     type                           shift and go to state 22
-    bool_literal                   shift and go to state 45
-    array                          shift and go to state 46
+    bool_literal                   shift and go to state 46
+    array                          shift and go to state 47
 
-state 171
+state 173
 
-    (31) for_iteration -> expression COMMA for_iteration .
+    (31) for_iteration -> var_assign COMMA for_iteration .
 
-    RPAREN          reduce using rule 31 (for_iteration -> expression COMMA for_iteration .)
+    RPAREN          reduce using rule 31 (for_iteration -> var_assign COMMA for_iteration .)
 
 
-state 172
+state 174
 
     (20) else_if_statement -> ELSE IF LPAREN boolean_expr RPAREN LBRACE body RBRACE . else_if_statement
     (20) else_if_statement -> . ELSE IF LPAREN boolean_expr RPAREN LBRACE body RBRACE else_if_statement
@@ -3935,36 +4076,36 @@ state 172
     (73) empty -> .
 
   ! shift/reduce conflict for ELSE resolved as shift
-    ELSE            shift and go to state 174
+    ELSE            shift and go to state 176
 
   ! ELSE            [ reduce using rule 73 (empty -> .) ]
 
-    else_if_statement              shift and go to state 175
-    empty                          shift and go to state 75
+    else_if_statement              shift and go to state 177
+    empty                          shift and go to state 77
 
-state 173
+state 175
 
     (34) for_loop -> FOR LPAREN for_assign SEMICOLON boolean_expr SEMICOLON for_iteration RPAREN LBRACE body . RBRACE
 
-    RBRACE          shift and go to state 176
+    RBRACE          shift and go to state 178
 
 
-state 174
+state 176
 
     (20) else_if_statement -> ELSE . IF LPAREN boolean_expr RPAREN LBRACE body RBRACE else_if_statement
     (21) else_if_statement -> ELSE . IF LPAREN boolean_expr RPAREN var_assign SEMICOLON
 
-    IF              shift and go to state 108
+    IF              shift and go to state 110
 
 
-state 175
+state 177
 
     (20) else_if_statement -> ELSE IF LPAREN boolean_expr RPAREN LBRACE body RBRACE else_if_statement .
 
     ELSE            reduce using rule 20 (else_if_statement -> ELSE IF LPAREN boolean_expr RPAREN LBRACE body RBRACE else_if_statement .)
 
 
-state 176
+state 178
 
     (34) for_loop -> FOR LPAREN for_assign SEMICOLON boolean_expr SEMICOLON for_iteration RPAREN LBRACE body RBRACE .
 
@@ -3972,6 +4113,7 @@ state 176
     FOR             reduce using rule 34 (for_loop -> FOR LPAREN for_assign SEMICOLON boolean_expr SEMICOLON for_iteration RPAREN LBRACE body RBRACE .)
     LPAREN          reduce using rule 34 (for_loop -> FOR LPAREN for_assign SEMICOLON boolean_expr SEMICOLON for_iteration RPAREN LBRACE body RBRACE .)
     STD             reduce using rule 34 (for_loop -> FOR LPAREN for_assign SEMICOLON boolean_expr SEMICOLON for_iteration RPAREN LBRACE body RBRACE .)
+    COMMENT         reduce using rule 34 (for_loop -> FOR LPAREN for_assign SEMICOLON boolean_expr SEMICOLON for_iteration RPAREN LBRACE body RBRACE .)
     IF              reduce using rule 34 (for_loop -> FOR LPAREN for_assign SEMICOLON boolean_expr SEMICOLON for_iteration RPAREN LBRACE body RBRACE .)
     NUMBER          reduce using rule 34 (for_loop -> FOR LPAREN for_assign SEMICOLON boolean_expr SEMICOLON for_iteration RPAREN LBRACE body RBRACE .)
     STR             reduce using rule 34 (for_loop -> FOR LPAREN for_assign SEMICOLON boolean_expr SEMICOLON for_iteration RPAREN LBRACE body RBRACE .)
@@ -4012,23 +4154,23 @@ WARNING: shift/reduce conflict for DOUBLE in state 4 resolved as shift
 WARNING: shift/reduce conflict for STRING in state 4 resolved as shift
 WARNING: shift/reduce conflict for BOOL in state 4 resolved as shift
 WARNING: shift/reduce conflict for INCLUDE in state 6 resolved as shift
-WARNING: shift/reduce conflict for ELSE in state 37 resolved as shift
-WARNING: shift/reduce conflict for PLUS in state 40 resolved as shift
-WARNING: shift/reduce conflict for MINUS in state 40 resolved as shift
-WARNING: shift/reduce conflict for PLUS in state 92 resolved as shift
-WARNING: shift/reduce conflict for MINUS in state 92 resolved as shift
-WARNING: shift/reduce conflict for DIVIDE in state 92 resolved as shift
-WARNING: shift/reduce conflict for TIMES in state 92 resolved as shift
-WARNING: shift/reduce conflict for AND in state 133 resolved as shift
-WARNING: shift/reduce conflict for OR in state 133 resolved as shift
-WARNING: shift/reduce conflict for AND in state 145 resolved as shift
-WARNING: shift/reduce conflict for OR in state 145 resolved as shift
-WARNING: shift/reduce conflict for ELSE in state 172 resolved as shift
+WARNING: shift/reduce conflict for ELSE in state 38 resolved as shift
+WARNING: shift/reduce conflict for PLUS in state 41 resolved as shift
+WARNING: shift/reduce conflict for MINUS in state 41 resolved as shift
+WARNING: shift/reduce conflict for PLUS in state 94 resolved as shift
+WARNING: shift/reduce conflict for MINUS in state 94 resolved as shift
+WARNING: shift/reduce conflict for DIVIDE in state 94 resolved as shift
+WARNING: shift/reduce conflict for TIMES in state 94 resolved as shift
+WARNING: shift/reduce conflict for AND in state 135 resolved as shift
+WARNING: shift/reduce conflict for OR in state 135 resolved as shift
+WARNING: shift/reduce conflict for AND in state 147 resolved as shift
+WARNING: shift/reduce conflict for OR in state 147 resolved as shift
+WARNING: shift/reduce conflict for ELSE in state 174 resolved as shift
 WARNING: reduce/reduce conflict in state 5 resolved using rule (start -> empty)
 WARNING: rejected rule (imports -> empty) in state 5
-WARNING: reduce/reduce conflict in state 86 resolved using rule (index -> variable)
-WARNING: rejected rule (expression -> variable) in state 86
-WARNING: reduce/reduce conflict in state 87 resolved using rule (index -> literal)
-WARNING: rejected rule (expression -> literal) in state 87
-WARNING: reduce/reduce conflict in state 101 resolved using rule (literal -> bool_literal)
-WARNING: rejected rule (boolean_expr -> bool_literal) in state 101
+WARNING: reduce/reduce conflict in state 88 resolved using rule (index -> variable)
+WARNING: rejected rule (expression -> variable) in state 88
+WARNING: reduce/reduce conflict in state 89 resolved using rule (index -> literal)
+WARNING: rejected rule (expression -> literal) in state 89
+WARNING: reduce/reduce conflict in state 103 resolved using rule (literal -> bool_literal)
+WARNING: rejected rule (boolean_expr -> bool_literal) in state 103
